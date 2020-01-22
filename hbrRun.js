@@ -83,43 +83,95 @@ HRB.prototype.loadFromBuffer = function(binHRB, onDone, onError) {
 }
 
 function getSymbol(context, symb) {
-    if(symb.name in context && typeof(context[symb.name]) == "function" )
+    if(symb.name in context)// && typeof(context[symb.name]) == "function" )
         return context[symb.name];
+    for (const key in context) {
+        if (context.hasOwnProperty(key)) {//  && typeof(context[key]) == "function" ) {
+            if(key.toUpperCase()==symb.name)
+                return context[key];
+        }
+    }
     if(context!=window) return getSymbol(window,symb);
     return undefined;
 }
-
-//from harbour\include\hbpcode.h
-//HRB.pCodes
 
 HRB.prototype.runCode = function(context,code,args) {
     var view = new DataView(code);
     var pCounter = 0;
     var stack = [];
+    var locals = [];
+    var nArgs = 0;
     while(true) {
         var pCode = view.getUint8(pCounter);
         switch(pCode) {
-            case 7: return; //HB_P_ENDPROC
-            case 20: //HB_P_DOSHORT
+            case   7 :               /* HB_P_ENDPROC instructs the virtual machine to end execution */
+                return;
+            case   9 :                 /* HB_P_FALSE pushes false on the virtual machine stack */
+                stack.push( false );
+                pCounter+=1;
+                break;
+            case  13 :                 /* HB_P_FRAME instructs the virtual machine about how many parameters and locals a function uses */
+                nArgs = view.getUint8(pCounter+1);
+                locals = Array(view.getUint8(pCounter+2));
+                pCounter+=3;
+                break;
+            case  20 :               /* HB_P_DOSHORT instructs the virtual machine to execute a function discarding its result */
                 var nParam = view.getUint8(pCounter+1,true);
-                var params = [];
+                var params = Array(nParam);
                 for(i=0;i<nParam;i++) {
-                    params.push(stack.pop().value);
+                    params[nParam-i-1] = stack.pop();
                 }
-                stack.pop().value.apply(undefined,params);
+                stack.pop().apply(undefined,params);
                 pCounter += 2;
                 break;
-            case 36: //HB_P_LINE
+            case  36 :                  /* HB_P_LINE currently compiled source code line number */
                 //var currLine = view.getUint16(pCounter+1,true);
                 pCounter+=3;
                 break;
-            case 106:  //HB_P_PUSHSTRSHORT
+            case  80 :          /* HB_P_POPLOCALNEAR pops the contents of the virtual machine stack onto a local variable */
+                var id = view.getUint8(pCounter+1);
+                if(id<=nArgs)
+                    args[id-1] = stack.pop();
+                else
+                    locals[id-1-nArgs] = stack.pop();
+                pCounter += 2;
+                break;
+            case  92 :              /* HB_P_PUSHBYTE places a 1 byte integer number on the virtual machine stack */
+                stack.push( view.getUint8(pCounter+1));
+                pCounter+=2;
+                break;
+            case  95 :         /* HB_P_PUSHLOCALNEAR pushes the contents of a local variable to the virtual machine stack */
+                var id = view.getUint8(pCounter+1);
+                if(id<=nArgs)
+                    stack.push( args[id-1]);
+                else
+                    stack.push( locals[id-1-nArgs]);
+                pCounter += 2;
+                break;
+            case 106 :          /* HB_P_PUSHSTRSHORT places a string on the virtual machine stack */
                 var len =  view.getUint8(pCounter+1,true);
-                stack.push( {type:"char", value: view.toStringANSI(pCounter+2,len) });
+                stack.push( view.toStringANSI(pCounter+2,len));
                 pCounter+=2+len;
                 break;
-            case 176: //HB_P_PUSHFUNCSYM
-                stack.push( {type:"symb", value: getSymbol(context, this.symbols[view.getUint16(pCounter+1,true)]) });
+            case 120 :                  /* HB_P_TRUE pushes true on the virtual machine stack */
+                stack.push( true );
+                pCounter+=1;
+                break;
+            case 121 :                  /* HB_P_ZERO places a ZERO on the virtual machine stack */
+                stack.push( 0 );
+                pCounter+=1;
+                break;
+            case 122 :                   /* HB_P_ONE places a ONE on the virtual machine stack */
+                stack.push( 1 );
+                pCounter+=1;
+                break;
+            case 134 :              /* HB_P_PUSHDATE places a data constant value on the virtual machine stack */
+                // from julian
+                stack.push( view.getUint32(pCounter+1,true) );
+                pCounter+=5;
+                break;
+            case 176 :           /* HB_P_PUSHFUNCSYM places a symbol on the virtual machine stack */
+                stack.push( getSymbol(context, this.symbols[view.getUint16(pCounter+1,true)]) );
                 pCounter+=3;
                 break;
             default:
@@ -133,7 +185,8 @@ HRB.prototype.runCode = function(context,code,args) {
 }
 
 HRB.prototype.getFn = function(context,code) {
-    return () => this.runCode(context,code,arguments);
+    var tc = this;
+    return function() { return tc.runCode(context,code,arguments); }
 }
 
 HRB.prototype.apply = function(context) {
