@@ -95,6 +95,24 @@ function getSymbol(context, symb) {
     return undefined;
 }
 
+// https://stackoverflow.com/a/26371251/854279
+function julianIntToDate(n) {
+    // convert a Julian number to a Gregorian Date.
+    //    S.Boisseau / BubblingApp.com / 2014
+    var a = n + 32044;
+    var b = Math.floor(((4*a) + 3)/146097);
+    var c = a - Math.floor((146097*b)/4);
+    var d = Math.floor(((4*c) + 3)/1461);
+    var e = c - Math.floor((1461 * d)/4);
+    var f = Math.floor(((5*e) + 2)/153);
+
+    var D = e + 1 - Math.floor(((153*f) + 2)/5);
+    var M = f + 3 - 12 - Math.round(f/10);
+    var Y = (100*b) + d - 4800 + Math.floor(f/10);
+
+    return new Date(Y,M,D);
+}
+
 HRB.prototype.runCode = function(context,code,args) {
     var view = new DataView(code);
     var pCounter = 0;
@@ -167,7 +185,7 @@ HRB.prototype.runCode = function(context,code,args) {
                 break;
             case 134 :              /* HB_P_PUSHDATE places a data constant value on the virtual machine stack */
                 // from julian
-                stack.push( view.getUint32(pCounter+1,true) );
+                stack.push( julianIntToDate(view.getUint32(pCounter+1,true)) );
                 pCounter+=5;
                 break;
             case 176 :           /* HB_P_PUSHFUNCSYM places a symbol on the virtual machine stack */
