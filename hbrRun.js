@@ -129,23 +129,65 @@ HRB.prototype.runCode = function(context,code,args) {
                 stack.push( false );
                 pCounter+=1;
                 break;
-            case  13 :                 /* HB_P_FRAME instructs the virtual machine about how many parameters and locals a function uses */
-                nArgs = view.getUint8(pCounter+1);
-                locals = Array(view.getUint8(pCounter+2));
-                pCounter+=3;
-                break;
+            case  11 :              /* HB_P_FUNCTION instructs the virtual machine to execute a function saving its result */
+            case  12 :         /* HB_P_FUNCTIONSHORT instructs the virtual machine to execute a function saving its result */
+            case  19 :                    /* HB_P_DO instructs the virtual machine to execute a function discarding its result */
             case  20 :               /* HB_P_DOSHORT instructs the virtual machine to execute a function discarding its result */
-                var nParam = view.getUint8(pCounter+1,true);
+                var nParam = pCode&1? view.getUint16(pCounter+1,true) : view.getUint8(pCounter+1,true);
                 var params = Array(nParam);
                 for(i=0;i<nParam;i++) {
                     params[nParam-i-1] = stack.pop();
                 }
-                stack.pop().apply(undefined,params);
-                pCounter += 2;
+                var ret = stack.pop().apply(undefined,params);
+                if(pCode<15)
+                    stack.push(ret);
+                pCounter += pCode&1? 3 : 2;
+                break;
+            case  13 :                 /* HB_P_FRAME instructs the virtual machine about how many parameters and locals a function uses */
+                locals = Array(view.getUint8(pCounter+1));
+                nArgs = view.getUint8(pCounter+2);
+                pCounter+=3;
+                break;
+            case  15 :               /* HB_P_GREATER checks if the second latest value on the stack is greater that the latest one */
+                stack.push(stack.pop()<stack.pop());
+                pCounter+=1;
+                break;
+            case  16 :          /* HB_P_GREATEREQUAL checks if the second latest value on the stack is greater equal that the latest one, leaves the result only */
+                stack.push(stack.pop()<=stack.pop());
+                pCounter+=1;
+                break;
+            case  28 :         /* HB_P_JUMPFALSENEAR checks a logic expression of the stack and jumps to a relative offset */
+            case  29 :             /* HB_P_JUMPFALSE checks a logic expression of the stack and jumps to a relative offset */
+            case  30 :          /* HB_P_JUMPFALSEFAR checks a logic expression of the stack and jumps to a relative offset */
+            case  31 :          /* HB_P_JUMPTRUENEAR checks a logic expression of the stack and jumps to a relative offset */
+            case  32 :              /* HB_P_JUMPTRUE checks a logic expression of the stack and jumps to a relative offset */
+            case  33 :           /* HB_P_JUMPTRUEFAR checks a logic expression of the stack and jumps to a relative offset */
+                if(pCode<31? !stack.pop() : stack.pop())
+                    switch(pCode%3) {
+                        case 1: // 28 - 31
+                            pCounter+=view.getUint8(pCounter+1,true);
+                            break;
+                        case 2: // 29-32
+                            pCounter+=view.getUint16(pCounter+1,true);
+                            break;
+                        case 0: // 30-33
+                            pCounter+=view.getUint32(pCounter+1,true);
+                            break;
+                }
+                else
+                    pCounter+=[2,3,5,2,3,5][pCode-28];
                 break;
             case  36 :                  /* HB_P_LINE currently compiled source code line number */
                 //var currLine = view.getUint16(pCounter+1,true);
                 pCounter+=3;
+                break;
+            case  49 :                 /* HB_P_MINUS subs the latest two values on the stack, removing them and leaving the result */
+                stack.push(-stack.pop()+stack.pop());
+                pCounter+=1;
+                break;
+            case  72 :                  /* HB_P_PLUS adds the latest two values on the stack, removing them and leaving the result */
+                stack.push(stack.pop()+stack.pop());
+                pCounter+=1;
                 break;
             case  80 :          /* HB_P_POPLOCALNEAR pops the contents of the virtual machine stack onto a local variable */
                 var id = view.getUint8(pCounter+1);
