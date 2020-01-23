@@ -119,11 +119,12 @@ HRB.prototype.runCode = function(context,code,args) {
     var stack = [];
     var locals = [];
     var nArgs = 0;
+    var returnVal = undefined;
     while(true) {
         var pCode = view.getUint8(pCounter);
         switch(pCode) {
             case   7 :               /* HB_P_ENDPROC instructs the virtual machine to end execution */
-                return;
+                return returnVal;
             case   9 :                 /* HB_P_FALSE pushes false on the virtual machine stack */
                 stack.push( false );
                 pCounter+=1;
@@ -170,6 +171,10 @@ HRB.prototype.runCode = function(context,code,args) {
                 var len =  view.getUint8(pCounter+1,true);
                 stack.push( view.toStringANSI(pCounter+2,len));
                 pCounter+=2+len;
+                break;
+            case 110 :              /* HB_P_RETVALUE instructs the virtual machine to return the latest stack value */
+                returnVal = stack.pop();
+                pCounter+=1;
                 break;
             case 120 :                  /* HB_P_TRUE pushes true on the virtual machine stack */
                 stack.push( true );

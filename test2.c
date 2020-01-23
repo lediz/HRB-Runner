@@ -55,8 +55,11 @@ HB_FUNC( MAIN )
 	HB_P_PUSHDATE, 247, 132, 37, 0,	/* 20200122 */
 	HB_P_PUSHLOCALNEAR, 1,	/* V */
 	HB_P_DOSHORT, 5,
+/* 00036 */ HB_P_LINE, 5, 0,	/* 5 */
+	HB_P_PUSHBYTE, 5,	/* 5 */
+	HB_P_RETVALUE,
 	HB_P_ENDPROC
-/* 00037 */
+/* 00043 */
    };
 
    hb_vmExecute( pcode, symbols );

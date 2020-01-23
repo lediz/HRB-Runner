@@ -16,6 +16,19 @@
                 "isDefault": true
             },
             "problemMatcher": "$harbour"
+        },{
+            "label": "generate Code",
+            "type": "shell",
+            "command": "harbour",
+            "windows": {
+                "command": "c:\\harbour32\\bin\\harbour.exe"
+            },
+            "args": ["${fileBasename}","-gc2"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$harbour"
         }
     ]
 }
