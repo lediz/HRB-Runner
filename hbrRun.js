@@ -123,6 +123,36 @@ HRB.prototype.runCode = function(context,code,args) {
     while(true) {
         var pCode = view.getUint8(pCounter);
         switch(pCode) {
+            case   0 :               /* HB_P_AND performs the logical AND of two latest stack values, removes them and places result */
+                stack.push(stack.pop()&&stack.pop());
+                pCounter+=1;
+                break;
+            case   1 :             /* HB_P_ARRAYPUSH places on the virtual machine stack an array element */
+                var idx = stack.pop();
+                var arr = stack.pop();
+                stack.push(arr[idx]);
+                pCounter+=1;
+                break;
+            case   2 :              /* HB_P_ARRAYPOP pops a value from the eval stack into an array element */
+                var idx = stack.pop();
+                var arr = stack.pop();
+                var val = stack.pop();
+                arr[idx] = val; //the array is always reference in js
+                pCounter+=1;
+                break;
+            case   3 :              /* HB_P_ARRAYDIM instructs the virtual machine to build an array with some specific dimensions */
+                stack.push(Array(view.getUint16(pCounter+1,true)));
+                pCounter+=3;
+                break;
+            case   4 :              /* HB_P_ARRAYGEN instructs the virtual machine to build an array and load element from the stack */
+                var n = view.getUint16(pCounter+1,true);
+                var r = Array(n);
+                for(let i=0;i<n;++i) {
+                    r[n-i-1] = stack.pop();
+                }
+                stack.push(r);
+                pCounter+=3;
+                break;
             case   7 :               /* HB_P_ENDPROC instructs the virtual machine to end execution */
                 return returnVal;
             case   9 :                 /* HB_P_FALSE pushes false on the virtual machine stack */
@@ -135,7 +165,7 @@ HRB.prototype.runCode = function(context,code,args) {
             case  20 :               /* HB_P_DOSHORT instructs the virtual machine to execute a function discarding its result */
                 var nParam = pCode&1? view.getUint16(pCounter+1,true) : view.getUint8(pCounter+1,true);
                 var params = Array(nParam);
-                for(i=0;i<nParam;i++) {
+                for(let i=0;i<nParam;++i) {
                     params[nParam-i-1] = stack.pop();
                 }
                 var ret = stack.pop().apply(undefined,params);
@@ -243,10 +273,6 @@ HRB.prototype.runCode = function(context,code,args) {
                 throw "unimplented pCode "+pCode;
         }
     }
-    for (let pPoint = 0; pPoint < view.length; pPoint++) {
-        const pCode = view[pPoint];
-
-    }
 }
 
 HRB.prototype.getFn = function(context,code) {
@@ -256,7 +282,7 @@ HRB.prototype.getFn = function(context,code) {
 
 HRB.prototype.apply = function(context) {
     if(!context) context=window;
-    for (const i in this.functions) {
+    for(const i in this.functions) {
         if (this.functions.hasOwnProperty(i)) {
             const thisFn = this.functions[i];
             context[thisFn.name] = this.getFn(context,thisFn.code);

@@ -1,7 +1,9 @@
 
 func main(v,c)
     LOCAL a:=subFn(4,3)
-    ? "Hello", a, .f., {^ 2020-01-22 }, v
+    c:={2,3,4}
+    c[2]:=10
+    ? "Hello", a, .f., {^ 2020-01-22 }, v, c[2]
 return 5
 
 function subFn(a,b)
