@@ -82,16 +82,26 @@ HRB.prototype.loadFromBuffer = function(binHRB, onDone, onError) {
     });
 }
 
-function getSymbol(context, symb) {
-    if(symb.name in context)// && typeof(context[symb.name]) == "function" )
-        return context[symb.name];
+function getSymbol(context, symb, mustOK) {
+    if(symb.ptr) return symb.ptr;
+    if(symb.name in context) {
+        symb.ptr = context[symb.name];
+        if(isNative(symb.ptr)) console.warn(symb.name + " native");
+        return symb.ptr;
+    }
     for (const key in context) {
         if (context.hasOwnProperty(key)) {//  && typeof(context[key]) == "function" ) {
-            if(key.toUpperCase()==symb.name)
-                return context[key];
+            if(key.toUpperCase()==symb.name) {
+                symb.ptr = context[key];
+                if(isNative(symb.ptr)) console.warn(symb.name + " native");
+                return symb.ptr;
+            }
         }
     }
-    if(context!=window) return getSymbol(window,symb);
+    if(context!=window) return getSymbol(window, symb, mustOK);
+    if(mustOK)
+        throw "symbol not found:" + symb.name
+    console.error("symbol not found:" + symb.name);
     return undefined;
 }
 
@@ -130,7 +140,7 @@ HRB.prototype.runCode = function(context,code,args) {
             case   1 :             /* HB_P_ARRAYPUSH places on the virtual machine stack an array element */
                 var idx = stack.pop();
                 var arr = stack.pop();
-                stack.push(arr[idx]);
+                stack.push(arr[idx-1]);
                 pCounter+=1;
                 break;
             case   2 :              /* HB_P_ARRAYPOP pops a value from the eval stack into an array element */
@@ -152,6 +162,11 @@ HRB.prototype.runCode = function(context,code,args) {
                 }
                 stack.push(r);
                 pCounter+=3;
+                break;
+            case   5 :                 /* HB_P_EQUAL check if the latest two values on the stack are equal, removing them and leaving the result */
+            case   8 :          /* HB_P_EXACTLYEQUAL check if the latest two values on the stack are exactly equal, removing them and leaving the result */
+                stack.push(stack.pop()==stack.pop());
+                pCounter+=1;
                 break;
             case   7 :               /* HB_P_ENDPROC instructs the virtual machine to end execution */
                 return returnVal;
@@ -186,6 +201,19 @@ HRB.prototype.runCode = function(context,code,args) {
                 stack.push(stack.pop()<=stack.pop());
                 pCounter+=1;
                 break;
+            case  24 :              /* HB_P_INSTRING checks if the second latest value on the stack is a substring of the latest one */
+                stack.push(stack.pop().indexOf(stack.pop())>=0);
+                pCounter+=1;
+                break;
+            case  25 :              /* HB_P_JUMPNEAR jumps to a relative offset 1 Byte */
+                pCounter+=view.getInt8(pCounter+1,true);
+                break;
+            case  26 :                  /* HB_P_JUMP jumps to a relative offset 2 Bytes */
+                pCounter+=view.getInt16(pCounter+1,true);
+                break;
+            case  27 :               /* HB_P_JUMPFAR jumps to a relative offset 3 Bytes */
+                pCounter+=view.getInt32(pCounter+1,true);
+                break;
             case  28 :         /* HB_P_JUMPFALSENEAR checks a logic expression of the stack and jumps to a relative offset */
             case  29 :             /* HB_P_JUMPFALSE checks a logic expression of the stack and jumps to a relative offset */
             case  30 :          /* HB_P_JUMPFALSEFAR checks a logic expression of the stack and jumps to a relative offset */
@@ -195,13 +223,13 @@ HRB.prototype.runCode = function(context,code,args) {
                 if(pCode<31? !stack.pop() : stack.pop())
                     switch(pCode%3) {
                         case 1: // 28 - 31
-                            pCounter+=view.getUint8(pCounter+1,true);
+                            pCounter+=view.getInt8(pCounter+1,true);
                             break;
                         case 2: // 29-32
-                            pCounter+=view.getUint16(pCounter+1,true);
+                            pCounter+=view.getInt16(pCounter+1,true);
                             break;
                         case 0: // 30-33
-                            pCounter+=view.getUint32(pCounter+1,true);
+                            pCounter+=view.getInt32(pCounter+1,true);
                             break;
                 }
                 else
@@ -213,6 +241,12 @@ HRB.prototype.runCode = function(context,code,args) {
                 break;
             case  49 :                 /* HB_P_MINUS subs the latest two values on the stack, removing them and leaving the result */
                 stack.push(-stack.pop()+stack.pop());
+                pCounter+=1;
+                break;
+            /* start: pcodes generated by the macro compiler - the symbol address is used */
+            /* end: */
+            case  68 :                   /* HB_P_NOT logically negates the latest value on the stack */
+                stack.push(!stack.pop());
                 pCounter+=1;
                 break;
             case  72 :                  /* HB_P_PLUS adds the latest two values on the stack, removing them and leaving the result */
@@ -265,8 +299,31 @@ HRB.prototype.runCode = function(context,code,args) {
                 stack.push( julianIntToDate(view.getUint32(pCounter+1,true)) );
                 pCounter+=5;
                 break;
+            /* optimization of inlined math operations */
+            case 165 :             /* HB_P_PUSHUNREF push unreferenced top item on HVM stack */
+                var v = stack.pop();
+                if(typeof(v)=="object") {
+                    if(Array.isArray(v))
+                        v=Array.from(v);
+                    else
+                        throw "unimpmeneted"
+                }
+                stack.push(v);
+                pCounter+=1;
+                break;
+            case 175 :          /* HB_P_LOCALINCPUSH increments the local variable, push result on the stack */
+                var id = view.getUint16(pCounter+1,true);
+                if(id<=nArgs) {
+                    ++args[id-1];
+                    stack.push(args[id-1]);
+                } else {
+                    ++locals[id-1-nArgs];
+                    stack.push( locals[id-1-nArgs]);
+                }
+                pCounter += 3;
+                break;
             case 176 :           /* HB_P_PUSHFUNCSYM places a symbol on the virtual machine stack */
-                stack.push( getSymbol(context, this.symbols[view.getUint16(pCounter+1,true)]) );
+                stack.push( getSymbol(context, this.symbols[view.getUint16(pCounter+1,true)], true) );
                 pCounter+=3;
                 break;
             default:
@@ -288,4 +345,20 @@ HRB.prototype.apply = function(context) {
             context[thisFn.name] = this.getFn(context,thisFn.code);
         }
     }
+    for(const i in this.symbols) {
+        if (this.symbols.hasOwnProperty(i)) {
+            getSymbol(context, this.symbols[i], false);
+        }
+
+    }
+}
+
+HRB.prototype.replaceSymbol = function(symbName, fn) {
+    symbName = symbName.toUpperCase();
+    var symb = this.symbols.find((v) => v.name = symbName );
+    if(symb) {
+        symb.ptr = fn;
+        return true;
+    }
+    return false;
 }

@@ -8,9 +8,9 @@
             "type": "shell",
             "command": "harbour",
             "windows": {
-                "command": "c:\\harbour32\\bin\\harbour.exe"
+                "command": "c:\\harbour\\bin\\win\\msvc64\\harbour.exe"
             },
-            "args": ["${fileBasename}","-gh"],
+            "args": ["${fileBasename}","-gh", "-n0", "-Ic:\\harbour\\include"],
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -21,9 +21,9 @@
             "type": "shell",
             "command": "harbour",
             "windows": {
-                "command": "c:\\harbour32\\bin\\harbour.exe"
+                "command": "c:\\harbour\\bin\\win\\msvc64\\harbour.exe"
             },
-            "args": ["${fileBasename}","-gc2"],
+            "args": ["${fileBasename}","-gc2", "-n0", "-Ic:\\harbour\\include"],
             "group": {
                 "kind": "build",
                 "isDefault": true
