@@ -123,6 +123,13 @@ function julianIntToDate(n) {
     return new Date(Y,M,D);
 }
 
+function GetDateTime(n,t) {
+    /** @type {date} */
+    var r = julianIntToDate(n);
+    r.setMilliseconds(t);
+    return r;
+}
+
 function VarReference(arr,idx) {
     this.arr = arr;
     this.idx = idx;
@@ -218,6 +225,16 @@ HRB.prototype.runCode = function(context,code,args) {
                 stack.push(stack.popValue()<=stack.popValue());
                 pCounter+=1;
                 break;
+            case  18 : {               /* HB_P_DIVIDE divides the latest two values on the stack, removing them and leaving the result */
+                let v = stack.popValue();
+                stack.push(stack.popValue()/v);
+                pCounter+=1;
+                break; }
+            case  22 :         /* HB_P_PUSHTIMESTAMP places a timestamp constant value on the virtual machine stack */
+                // from julian
+                stack.push( GetDateTime(view.getUint32(pCounter+1,true),view.getUint32(pCounter+5,true) ) );
+                pCounter+=9;
+                break;
             case  24 :              /* HB_P_INSTRING checks if the second latest value on the stack is a substring of the latest one */
                 stack.push(stack.popValue().indexOf(stack.popValue())>=0);
                 pCounter+=1;
@@ -290,6 +307,13 @@ HRB.prototype.runCode = function(context,code,args) {
                     stack.push( locals[id-1-nArgs]);
                 pCounter += 2;
                 break; }
+            case 101 :            /* HB_P_PUSHDOUBLE places a double number on the virtual machine stack */
+                stack.push(view.getFloat64(pCounter+1,true));
+                // let size = view.getUint8(pCounter+9);
+                // let decimals = view.getUint8(pCounter+10);
+                // TODO: size and decimal ignored.
+                pCounter+=11;
+                break;
             case 106 : {         /* HB_P_PUSHSTRSHORT places a string on the virtual machine stack */
                 let len =  view.getUint8(pCounter+1,true);
                 stack.push( view.toStringANSI(pCounter+2,len));
@@ -316,6 +340,19 @@ HRB.prototype.runCode = function(context,code,args) {
                 stack.push( julianIntToDate(view.getUint32(pCounter+1,true)) );
                 pCounter+=5;
                 break;
+            case 135 : {            /* HB_P_PLUSEQPOP adds a value to the variable reference */
+                let d = stack.popValue();
+                let v = stack.pop();
+                if(typeof(v)!="object" || v.constructor!=VarReference) throw "VM error";
+                v.arr[v.idx]+=d;
+                pCounter++;
+                break;  }
+            case 136 : {           /* HB_P_MINUSEQPOP subs a value from the variable reference */
+                let d = stack.popValue();
+                let v = stack.pop();
+                if(typeof(v)!="object" || v.constructor!=VarReference) throw "VM error";
+                v.arr[v.idx]-=d;
+                break;  }
             /* optimization of inlined math operations */
             case 148 : {         /* HB_P_ARRAYPUSHREF pushes reference to array element */
                 let idx = stack.popValue()-1;

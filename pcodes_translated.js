@@ -10,9 +10,7 @@ HRB.prototype.runCode = function(context,code,args) {
         case  10 :               /* HB_P_FORTEST For STEP. If step > 1 less. If step < 1 greater. */
         case  14 :               /* HB_P_FUNCPTR returns a function address pointer */
         case  17 :                   /* HB_P_DEC decrements the latest value on the virtual machine stack */
-        case  18 :                /* HB_P_DIVIDE divides the latest two values on the stack, removing them and leaving the result */
         case  21 :             /* HB_P_DUPLICATE places a copy of the latest virtual machine stack value on to the stack */
-        case  22 :         /* HB_P_PUSHTIMESTAMP places a timestamp constant value on the virtual machine stack */
         case  23 :                   /* HB_P_INC increments the latest value on the virtual machine stack */
         case  24 :              /* HB_P_INSTRING checks if the second latest value on the stack is a substring of the latest one */
         case  34 :             /* HB_P_LESSEQUAL checks if the second latest value on the stack is less equal that the latest one, leaves the result only */
@@ -78,7 +76,6 @@ HRB.prototype.runCode = function(context,code,args) {
         case  98 :            /* HB_P_PUSHMEMVAR pushes the contents of a memvar variable to the virtual machine stack */
         case  99 :         /* HB_P_PUSHMEMVARREF pushes the a memvar variable by reference to the virtual machine stack */
         case 100 :               /* HB_P_PUSHNIL places a nil on the virtual machine stack */
-        case 101 :            /* HB_P_PUSHDOUBLE places a double number on the virtual machine stack */
         case 102 :              /* HB_P_PUSHSELF pushes Self for the current processed method */
         case 103 :            /* HB_P_PUSHSTATIC pushes the contents of a static variable to the virtual machine stack */
         case 104 :         /* HB_P_PUSHSTATICREF pushes the a static variable by reference to the virtual machine stack */
@@ -107,8 +104,6 @@ HRB.prototype.runCode = function(context,code,args) {
         case 132 :               /* HB_P_ENUMEND End of FOR EACH loop */
         case 133 :                /* HB_P_SWITCH SWITCH using long values */
 /* optimization of inlined math operations */
-        case 135 :             /* HB_P_PLUSEQPOP adds a value to the variable reference */
-        case 136 :            /* HB_P_MINUSEQPOP subs a value from the variable reference */
         case 137 :             /* HB_P_MULTEQPOP multiplies a variable reference by a value */
         case 138 :              /* HB_P_DIVEQPOP divides the var reference by a value */
         case 139 :                /* HB_P_PLUSEQ adds a value to the variable reference, leave result on the stack */

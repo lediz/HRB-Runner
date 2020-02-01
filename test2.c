@@ -55,6 +55,24 @@ HB_FUNC( MAIN )
 	HB_P_ARRAYPUSHREF,
 	HB_P_DECEQPOP,
 /* 00050 */ HB_P_LINE, 7, 0,	/* 7 */
+	HB_P_PUSHBYTE, 4,	/* 4 */
+	HB_P_PUSHLOCALNEAR, 2,	/* C */
+	HB_P_PUSHBYTE, 2,	/* 2 */
+	HB_P_ARRAYPUSH,
+	HB_P_DIVIDE,
+	HB_P_POPLOCALNEAR, 1,	/* V */
+/* 00063 */ HB_P_LINE, 8, 0,	/* 8 */
+	HB_P_PUSHTIMESTAMP, 247, 132, 37, 0, 128, 41, 179, 2,	/* 2020-01-22 12:34:56.000 */
+	HB_P_PUSHLOCALNEAR, 2,	/* C */
+	HB_P_ONE,
+	HB_P_ARRAYPOP,
+/* 00079 */ HB_P_LINE, 9, 0,	/* 9 */
+	HB_P_PUSHLOCALNEAR, 2,	/* C */
+	HB_P_ONE,
+	HB_P_ARRAYPUSHREF,
+	HB_P_ONE,
+	HB_P_PLUSEQPOP,
+/* 00088 */ HB_P_LINE, 10, 0,	/* 10 */
 	HB_P_PUSHFUNCSYM, 2, 0,	/* QOUT */
 	HB_P_PUSHSTRSHORT, 6,	/* 6 */
 	'H', 'e', 'l', 'l', 'o', 0, 
@@ -65,12 +83,15 @@ HB_FUNC( MAIN )
 	HB_P_PUSHLOCALNEAR, 2,	/* C */
 	HB_P_PUSHBYTE, 2,	/* 2 */
 	HB_P_ARRAYPUSH,
-	HB_P_DOSHORT, 6,
-/* 00081 */ HB_P_LINE, 8, 0,	/* 8 */
+	HB_P_PUSHLOCALNEAR, 2,	/* C */
+	HB_P_ONE,
+	HB_P_ARRAYPUSH,
+	HB_P_DOSHORT, 7,
+/* 00123 */ HB_P_LINE, 11, 0,	/* 11 */
 	HB_P_PUSHBYTE, 5,	/* 5 */
 	HB_P_RETVALUE,
 	HB_P_ENDPROC
-/* 00088 */
+/* 00130 */
    };
 
    hb_vmExecute( pcode, symbols );
@@ -81,18 +102,18 @@ HB_FUNC( SUBFN )
    static const HB_BYTE pcode[] =
    {
 	HB_P_FRAME, 0, 2,	/* locals, params */
-/* 00003 */ HB_P_LINE, 11, 0,	/* 11 */
+/* 00003 */ HB_P_LINE, 14, 0,	/* 14 */
 	HB_P_PUSHLOCALNEAR, 1,	/* A */
 	HB_P_PUSHLOCALNEAR, 2,	/* B */
 	HB_P_GREATER,
 	HB_P_JUMPFALSENEAR, 12,	/* 12 (abs: 00023) */
-/* 00013 */ HB_P_LINE, 12, 0,	/* 12 */
+/* 00013 */ HB_P_LINE, 15, 0,	/* 15 */
 	HB_P_PUSHLOCALNEAR, 1,	/* A */
 	HB_P_PUSHLOCALNEAR, 2,	/* B */
 	HB_P_MINUS,
 	HB_P_RETVALUE,
 	HB_P_ENDPROC,
-/* 00023 */ HB_P_LINE, 14, 0,	/* 14 */
+/* 00023 */ HB_P_LINE, 17, 0,	/* 17 */
 	HB_P_PUSHLOCALNEAR, 1,	/* A */
 	HB_P_PUSHLOCALNEAR, 2,	/* B */
 	HB_P_PLUS,
