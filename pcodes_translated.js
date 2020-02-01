@@ -120,7 +120,6 @@ HRB.prototype.runCode = function(context,code,args) {
         case 145 :         /* HB_P_WITHOBJECTEND end WITH OBJECT code */
         case 146 :             /* HB_P_MACROSEND send operator with macro list params */
         case 147 :           /* HB_P_PUSHOVARREF pushes reference to object variable */
-        case 148 :          /* HB_P_ARRAYPUSHREF pushes reference to array element */
         case 149 :                /* HB_P_VFRAME frame with variable number of parameters */
         case 150 :            /* HB_P_LARGEFRAME frame with more then 255 locals */
         case 151 :           /* HB_P_LARGEVFRAME frame with variable number of parameters and more then 255 locals */
@@ -140,7 +139,6 @@ HRB.prototype.runCode = function(context,code,args) {
         case 166 :             /* HB_P_SEQALWAYS set BEGIN SEQUENCE/ALWAYS section */
         case 167 :           /* HB_P_ALWAYSBEGIN start ALWAYS section */
         case 168 :             /* HB_P_ALWAYSEND finish ALWAYS section */
-        case 169 :              /* HB_P_DECEQPOP decrements the var reference */
         case 170 :              /* HB_P_INCEQPOP increments the var reference */
         case 171 :                 /* HB_P_DECEQ decrements the var reference, leave result on the stack */
         case 172 :                 /* HB_P_INCEQ increments the var reference, leave result on the stack */
