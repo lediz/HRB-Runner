@@ -42,8 +42,6 @@ HRB.prototype.runCode = function(context,code,args) {
         case  63 :              /* HB_P_MPUSHSYM */
         case  64 :         /* HB_P_MPUSHVARIABLE */
 /* end: */
-        case  65 :                  /* HB_P_MULT multiplies the latest two values on the stack, removing them and leaving the result */
-        case  66 :                /* HB_P_NEGATE numerically negates the latest value on the stack */
         case  67 :                  /* HB_P_NOOP no operation */
         case  68 :                   /* HB_P_NOT logically negates the latest value on the stack */
         case  70 :                    /* HB_P_OR performs the logical OR of two latest stack values, removes them and places result */

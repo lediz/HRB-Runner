@@ -76,3 +76,27 @@ QUnit.test( "comparissons", function( assert ) {
     assert.equal( LowerEqual(2,2), true, "compare lower equal number true");
     assert.equal( LowerEqual(2,1), false, "compare lower equal number false");
 });
+
+QUnit.test( "base math", function( assert ) {
+    var runner = new HRB();
+    // function negate(a); return -a
+    var neg = (a) => runner.runCode({},(new Int8Array([13,0,1,95,1,66,110,7])).buffer,[a]);
+    //function add(a,b); return a+b
+    var add = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,72,110,7])).buffer,[a,b]);
+    //function sub(a,b); return a-b
+    var sub = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,49,110,7])).buffer,[a,b]);
+    //function mul(a,b); return a*b
+    var mul = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,65,110,7])).buffer,[a,b]);
+    //function div(a,b); return a/b
+    var div = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,18,110,7])).buffer,[a,b]);
+    assert.equal( neg(0.1), -0.1, "negate number");
+    assert.equal( add(1,2), 3, "sum 2 numbers int");
+    assert.equal( add(0.1,0.2), 0.1+0.2, "sum 2 numbers float");
+    assert.equal( sub(1,2), -1, "sub 2 numbers int");
+    assert.equal( sub(0.1,0.2), -0.1, "sub 2 numbers float");
+    assert.equal( mul(2,3), 6, "mul 2 numbers int");
+    assert.equal( mul(0.2,3.0), 0.2*3, "mul 2 numbers float");
+    assert.equal( div(1,2), 0.5, "div 2 numbers int");
+    assert.equal( div(0.1,0.2), 0.5, "div 2 numbers float");
+
+});
