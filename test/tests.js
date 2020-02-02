@@ -99,4 +99,5 @@ QUnit.test( "base math", function( assert ) {
     assert.equal( div(1,2), 0.5, "div 2 numbers int");
     assert.equal( div(0.1,0.2), 0.5, "div 2 numbers float");
 
+    assert.equal( add("1","2"), "12", "sum string");
 });

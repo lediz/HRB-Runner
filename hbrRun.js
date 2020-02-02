@@ -303,10 +303,11 @@ HRB.prototype.runCode = function(context,code,args) {
                 stack.push(stack.popValue()!=stack.popValue());
                 pCounter+=1;
                 break;
-            case  72 :                  /* HB_P_PLUS adds the latest two values on the stack, removing them and leaving the result */
-                stack.push(stack.popValue()+stack.popValue());
+            case  72 : {                 /* HB_P_PLUS adds the latest two values on the stack, removing them and leaving the result */
+                var v=stack.popValue();
+                stack.push(stack.popValue()+v);
                 pCounter+=1;
-                break;
+                break; }
             case  80 : {         /* HB_P_POPLOCALNEAR pops the contents of the virtual machine stack onto a local variable */
                 let id = view.getUint8(pCounter+1);
                 if(id<=nArgs)
