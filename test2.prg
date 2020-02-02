@@ -6,7 +6,7 @@ func main(v,c)
     c[2]--
     v := 4/c[2]
     c[1] = {^ 2020-01-22 12:34:56 }
-    c[1]+=1
+    c[1]+=1 // it does not work
     ? "Hello", a, .f., {^ 2020-01-22 }, v, c[2],  c[1]
 return 5
 

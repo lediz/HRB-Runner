@@ -296,8 +296,12 @@ HRB.prototype.runCode = function(context,code,args) {
                 pCounter += 2;
                 break; }
             case  92 :              /* HB_P_PUSHBYTE places a 1 byte integer number on the virtual machine stack */
-                stack.push( view.getUint8(pCounter+1));
+                stack.push( view.getInt8(pCounter+1));
                 pCounter+=2;
+                break;
+            case  93 :               /* HB_P_PUSHINT places an integer number on the virtual machine stack */
+                stack.push( view.getInt16(pCounter+1,true));
+                pCounter+=3;
                 break;
             case  95 : {        /* HB_P_PUSHLOCALNEAR pushes the contents of a local variable to the virtual machine stack */
                 let id = view.getUint8(pCounter+1);
@@ -307,6 +311,10 @@ HRB.prototype.runCode = function(context,code,args) {
                     stack.push( locals[id-1-nArgs]);
                 pCounter += 2;
                 break; }
+            case  97 :              /* HB_P_PUSHLONG places an integer number on the virtual machine stack */
+                stack.push( view.getInt32(pCounter+1,true));
+                pCounter+=5;
+                break;
             case 101 :            /* HB_P_PUSHDOUBLE places a double number on the virtual machine stack */
                 stack.push(view.getFloat64(pCounter+1,true));
                 // let size = view.getUint8(pCounter+9);

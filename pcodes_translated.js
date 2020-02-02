@@ -69,10 +69,8 @@ HRB.prototype.runCode = function(context,code,args) {
         case  89 :             /* HB_P_PUSHBLOCK start of a codeblock definition */
         case  90 :        /* HB_P_PUSHBLOCKSHORT start of a codeblock definition */
         case  91 :             /* HB_P_PUSHFIELD pushes an unaliased field */
-        case  93 :               /* HB_P_PUSHINT places an integer number on the virtual machine stack */
         case  94 :             /* HB_P_PUSHLOCAL pushes the contents of a local variable to the virtual machine stack */
         case  96 :          /* HB_P_PUSHLOCALREF pushes a local variable by reference to the virtual machine stack */
-        case  97 :              /* HB_P_PUSHLONG places an integer number on the virtual machine stack */
         case  98 :            /* HB_P_PUSHMEMVAR pushes the contents of a memvar variable to the virtual machine stack */
         case  99 :         /* HB_P_PUSHMEMVARREF pushes the a memvar variable by reference to the virtual machine stack */
         case 100 :               /* HB_P_PUSHNIL places a nil on the virtual machine stack */

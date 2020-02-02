@@ -2,33 +2,30 @@
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
     "version": "2.0.0",
+    "command": "harbour",
+    "windows": {
+        "command": "c:\\harbour\\bin\\win\\msvc64\\harbour.exe",
+    },
+    "problemMatcher": "$harbour",
+    "options": {
+        "cwd": "${fileDirname}"
+    },
     "tasks": [
         {
             "label": "generate HRB",
             "type": "shell",
-            "command": "harbour",
-            "windows": {
-                "command": "c:\\harbour\\bin\\win\\msvc64\\harbour.exe"
-            },
             "args": ["${fileBasename}","-gh", "-n0", "-Ic:\\harbour\\include"],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": "$harbour"
+            "group": "build"
         },{
             "label": "generate Code",
             "type": "shell",
-            "command": "harbour",
-            "windows": {
-                "command": "c:\\harbour\\bin\\win\\msvc64\\harbour.exe"
-            },
             "args": ["${fileBasename}","-gc2", "-n0", "-Ic:\\harbour\\include"],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": "$harbour"
+            "group": "build"
+        },{
+            "label": "generate byte code",
+            "type": "shell",
+            "args": ["${fileBasename}","-gc0", "-n0", "-Ic:\\harbour\\include"],
+            "group": "build"
         }
     ]
 }
