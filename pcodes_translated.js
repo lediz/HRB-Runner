@@ -13,8 +13,6 @@ HRB.prototype.runCode = function(context,code,args) {
         case  21 :             /* HB_P_DUPLICATE places a copy of the latest virtual machine stack value on to the stack */
         case  23 :                   /* HB_P_INC increments the latest value on the virtual machine stack */
         case  24 :              /* HB_P_INSTRING checks if the second latest value on the stack is a substring of the latest one */
-        case  34 :             /* HB_P_LESSEQUAL checks if the second latest value on the stack is less equal that the latest one, leaves the result only */
-        case  35 :                  /* HB_P_LESS checks if the second latest value on the stack is less that the latest one */
         case  37 :             /* HB_P_LOCALNAME sets the name of local variable */
         case  38 :              /* HB_P_MACROPOP compile and run - pop a value from the stack */
         case  39 :       /* HB_P_MACROPOPALIASED compile and run - pop a field value from the stack */
@@ -48,7 +46,6 @@ HRB.prototype.runCode = function(context,code,args) {
         case  66 :                /* HB_P_NEGATE numerically negates the latest value on the stack */
         case  67 :                  /* HB_P_NOOP no operation */
         case  68 :                   /* HB_P_NOT logically negates the latest value on the stack */
-        case  69 :              /* HB_P_NOTEQUAL checks if the latest two stack values are equal, leaves just the result */
         case  70 :                    /* HB_P_OR performs the logical OR of two latest stack values, removes them and places result */
         case  72 :                  /* HB_P_PLUS adds the latest two values on the stack, removing them and leaving the result */
         case  73 :                   /* HB_P_POP removes the latest value from the stack */

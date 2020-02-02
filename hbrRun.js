@@ -218,11 +218,11 @@ HRB.prototype.runCode = function(context,code,args) {
                 pCounter+=3;
                 break;
             case  15 :               /* HB_P_GREATER checks if the second latest value on the stack is greater that the latest one */
-                stack.push(stack.popValue()<stack.popValue());
+                stack.push(stack.popValue()<stack.popValue()); //I changed the direction because the value are swapped
                 pCounter+=1;
                 break;
             case  16 :          /* HB_P_GREATEREQUAL checks if the second latest value on the stack is greater equal that the latest one, leaves the result only */
-                stack.push(stack.popValue()<=stack.popValue());
+                stack.push(stack.popValue()<=stack.popValue()); //I changed the direction because the value are swapped
                 pCounter+=1;
                 break;
             case  18 : {               /* HB_P_DIVIDE divides the latest two values on the stack, removing them and leaving the result */
@@ -269,6 +269,14 @@ HRB.prototype.runCode = function(context,code,args) {
                 else
                     pCounter+=[2,3,5,2,3,5][pCode-28];
                 break;
+            case  34 :             /* HB_P_LESSEQUAL checks if the second latest value on the stack is less equal that the latest one, leaves the result only */
+                stack.push(stack.popValue()>=stack.popValue()); //I changed the direction because the value are swapped
+                pCounter+=1;
+                break;
+            case  35 :                  /* HB_P_LESS checks if the second latest value on the stack is less that the latest one */
+                stack.push(stack.popValue()>stack.popValue()); //I changed the direction because the value are swapped
+                pCounter+=1;
+                break;
             case  36 :                  /* HB_P_LINE currently compiled source code line number */
                 currLine = view.getUint16(pCounter+1,true);
                 pCounter+=3;
@@ -281,6 +289,10 @@ HRB.prototype.runCode = function(context,code,args) {
             /* end: */
             case  68 :                   /* HB_P_NOT logically negates the latest value on the stack */
                 stack.push(!stack.popValue());
+                pCounter+=1;
+                break;
+            case  69 :              /* HB_P_NOTEQUAL checks if the latest two stack values are equal, leaves just the result */
+                stack.push(stack.popValue()!=stack.popValue());
                 pCounter+=1;
                 break;
             case  72 :                  /* HB_P_PLUS adds the latest two values on the stack, removing them and leaving the result */
