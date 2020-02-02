@@ -8,3 +8,5 @@ func UInt32Value(); return 100000
 func Int8Value(); return -10
 func Int16Value(); return -1000
 func Int32Value(); return -100000
+func DoubleValue(); return 3.14159265359
+func StringValue(); return "HelloWorld"
