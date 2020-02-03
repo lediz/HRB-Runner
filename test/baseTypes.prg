@@ -1,3 +1,4 @@
+func nilValue(); return nil
 func booleanTrue(); return .T.
 func booleanFalse(); return .F.
 func ZeroValue(); return 0
@@ -10,3 +11,7 @@ func Int16Value(); return -1000
 func Int32Value(); return -100000
 func DoubleValue(); return 3.14159265359
 func StringValue(); return "HelloWorld"
+func ArrayValue(); return {1,2}
+func ArrayValue2()
+    LOCAL a[2]
+return a

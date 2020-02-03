@@ -1,5 +1,7 @@
 QUnit.test( "baseTypes", function( assert ) {
     var runner = new HRB();
+    // func nilValue(); return nil
+    assert.equal( runner.runCode({},(new Int8Array([100,110,7])).buffer,[]), undefined, "nilvalue");
     // func booleanTrue(); return .T.
     assert.equal( runner.runCode({},(new Int8Array([120,110,7])).buffer,[]), true, "Logical true");
     // func booleanFalse(); return .T.
@@ -25,6 +27,10 @@ QUnit.test( "baseTypes", function( assert ) {
     assert.equal( runner.runCode({},(new Int8Array([101,234,46,68,84,251,33,9,64,10,11,110,7])).buffer,[]), 3.14159265359, "numeric pi");
     //func StringValue(); return "HelloWorld"
     assert.equal( runner.runCode({},(new Int8Array([106,11,72,101,108,108,111,87,111,114,108,100,0,110,7])).buffer,[]), "HelloWorld", "character HelloWorld");
+    //func ArrayValue(); return {1,2}
+    assert.deepEqual( runner.runCode({},(new Int8Array([122,92,2,4,2,0,110,7])).buffer,[]), [1,2], "array direct");
+    //func ArrayValue2(); return Array(2)
+    assert.deepEqual( runner.runCode({},(new Int8Array([13,1,0,36,16,0,92,2,3,1,0,80,1,36,17,0,95,1,110,7])).buffer,[]), [undefined,undefined], "array empty");
 });
 
 QUnit.test( "dateTimeTypes", function( assert ) {

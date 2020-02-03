@@ -135,6 +135,17 @@ function VarReference(arr,idx) {
     this.idx = idx;
 }
 
+function generateArray(dims) {
+    var ret = Array(dims[0]);
+    if(dims.length>1) {
+        var subDim = dims.slice(1);
+        for (let i = 0; i < ret.length; i++) {
+            ret[i]=generateArray(subDim);
+        }
+    }
+    return ret;
+}
+
 VarReference.prototype.value = function() { return this.arr[this.idx]; }
 
 
@@ -174,17 +185,14 @@ HRB.prototype.runCode = function(context,code,args) {
                 arr[idx] = val; //the array is always reference in js
                 pCounter+=1;
                 break; }
-            case   3 :              /* HB_P_ARRAYDIM instructs the virtual machine to build an array with some specific dimensions */
-                stack.push(Array(view.getUint16(pCounter+1,true)));
+            case   3 :  {            /* HB_P_ARRAYDIM instructs the virtual machine to build an array with some specific dimensions */
+                let n = view.getUint16(pCounter+1,true);
+                stack.push(generateArray(stack.splice(stack.length-n)));
                 pCounter+=3;
-                break;
+                break; }
             case   4 : {             /* HB_P_ARRAYGEN instructs the virtual machine to build an array and load element from the stack */
                 let n = view.getUint16(pCounter+1,true);
-                let r = Array(n);
-                for(let i=0;i<n;++i) {
-                    r[n-i-1] = stack.popValue();
-                }
-                stack.push(r);
+                stack.push(stack.splice(stack.length-n));
                 pCounter+=3;
                 break; }
             case   5 :                 /* HB_P_EQUAL check if the latest two values on the stack are equal, removing them and leaving the result */
@@ -203,10 +211,7 @@ HRB.prototype.runCode = function(context,code,args) {
             case  19 :                    /* HB_P_DO instructs the virtual machine to execute a function discarding its result */
             case  20 : {              /* HB_P_DOSHORT instructs the virtual machine to execute a function discarding its result */
                 let nParam = pCode&1? view.getUint16(pCounter+1,true) : view.getUint8(pCounter+1,true);
-                let params = Array(nParam);
-                for(let i=0;i<nParam;++i) {
-                    params[nParam-i-1] = stack.popValue();
-                }
+                let params = stack.splice(stack.length-nParam);
                 let ret = stack.popValue().apply(undefined,params);
                 if(pCode<15)
                     stack.push(ret);
@@ -335,6 +340,10 @@ HRB.prototype.runCode = function(context,code,args) {
             case  97 :              /* HB_P_PUSHLONG places an integer number on the virtual machine stack */
                 stack.push( view.getInt32(pCounter+1,true));
                 pCounter+=5;
+                break;
+            case 100 :               /* HB_P_PUSHNIL places a nil on the virtual machine stack */
+                stack.push( undefined );
+                pCounter++;
                 break;
             case 101 :            /* HB_P_PUSHDOUBLE places a double number on the virtual machine stack */
                 stack.push(view.getFloat64(pCounter+1,true));

@@ -68,7 +68,6 @@ HRB.prototype.runCode = function(context,code,args) {
         case  96 :          /* HB_P_PUSHLOCALREF pushes a local variable by reference to the virtual machine stack */
         case  98 :            /* HB_P_PUSHMEMVAR pushes the contents of a memvar variable to the virtual machine stack */
         case  99 :         /* HB_P_PUSHMEMVARREF pushes the a memvar variable by reference to the virtual machine stack */
-        case 100 :               /* HB_P_PUSHNIL places a nil on the virtual machine stack */
         case 102 :              /* HB_P_PUSHSELF pushes Self for the current processed method */
         case 103 :            /* HB_P_PUSHSTATIC pushes the contents of a static variable to the virtual machine stack */
         case 104 :         /* HB_P_PUSHSTATICREF pushes the a static variable by reference to the virtual machine stack */
