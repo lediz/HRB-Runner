@@ -1,4 +1,4 @@
-// 28/181 codes tested
+// 32/181 codes tested
 QUnit.test( "baseTypes", function( assert ) {
     var runner = new HRB();
     // TESTING:
@@ -7,6 +7,7 @@ QUnit.test( "baseTypes", function( assert ) {
     // HB_P_PUSHBYTE, HB_P_PUSHINT, HB_P_PUSHLONG
     // HB_P_PUSHDOUBLE, HB_P_PUSHSTRSHORT, HB_P_ARRAYPOP,
     // HB_P_ARRAYGEN,  HB_P_FRAME, HB_P_ARRAYDIM, HB_P_POPLOCALNEAR
+    // HB_P_PUSHDATE,HB_P_PUSHTIMESTAMP
     // func nilValue(); return nil
     assert.equal( runner.runCode({},(new Int8Array([100,110,7])).buffer,[]), undefined, "nilvalue");
     // func booleanTrue(); return .T.
@@ -38,14 +39,10 @@ QUnit.test( "baseTypes", function( assert ) {
     assert.deepEqual( runner.runCode({},(new Int8Array([122,92,2,4,2,0,110,7])).buffer,[]), [1,2], "array direct");
     //func ArrayValue2(); return Array(2)
     assert.deepEqual( runner.runCode({},(new Int8Array([13,1,0,36,16,0,92,2,3,1,0,80,1,36,17,0,95,1,110,7])).buffer,[]), [undefined,undefined], "array empty");
-});
-
-QUnit.test( "dateTimeTypes", function( assert ) {
-    var runner = new HRB();
-    // func date1(); return {^ 2020-01-01 }
-    assert.equal( runner.runCode({},(new Int8Array([134,226,132,37,0,110,7])).buffer,[]) - new Date(2020,0,1), 0, "simple date");
-    // func dateTime1(); return {^ 2020-01-01 12:34:56.1 }
-    assert.equal( runner.runCode({},(new Int8Array([22,226,132,37,0,228,41,179,2,110,7])).buffer,[])- new Date(2020,0,1,12,34,56,100),0, "simple datetime ");
+    // func DateValue(); return {^ 2020-01-15 }
+    assert.deepEqual( runner.runCode({},(new Int8Array([134,240,132,37,0,110,7])).buffer,[]), new Date(2020,0,15), "simple date");
+    // func DateValueTime(); return {^ 1987-12-01 12:34:56 }
+    assert.deepEqual( runner.runCode({},(new Int8Array([22,27,87,37,0,128,41,179,2,110,7])).buffer,[]), new Date(1987,11,1,12,34,56,100), "simple datetime ");
 });
 
 QUnit.test( "comparissons", function( assert ) {

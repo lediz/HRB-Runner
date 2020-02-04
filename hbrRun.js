@@ -105,22 +105,24 @@ function getSymbol(context, symb, mustOK) {
     return undefined;
 }
 
-// https://stackoverflow.com/a/26371251/854279
-function julianIntToDate(n) {
-    // convert a Julian number to a Gregorian Date.
-    //    S.Boisseau / BubblingApp.com / 2014
-    var a = n + 32044;
-    var b = Math.floor(((4*a) + 3)/146097);
-    var c = a - Math.floor((146097*b)/4);
-    var d = Math.floor(((4*c) + 3)/1461);
-    var e = c - Math.floor((1461 * d)/4);
-    var f = Math.floor(((5*e) + 2)/153);
+function julianIntToDate(lJulian) {
+    // void hb_dateDecode( long lJulian, int * piYear, int * piMonth, int * piDay )
+    var U, V, W, X, J;
 
-    var D = e + 1 - Math.floor(((153*f) + 2)/5);
-    var M = f + 3 - 12 - Math.round(f/10);
-    var Y = (100*b) + d - 4800 + Math.floor(f/10);
+    J = lJulian + 68569;
+    W = Math.floor(( J * 4 ) / 146097);
+    J -= Math.floor(( ( 146097 * W ) + 3 ) / 4);
+    X = Math.floor(4000 * ( J + 1 ) / 1461001);
+    J -= Math.floor( ( 1461 * X ) / 4 ) - 31;
+    V = Math.floor(80 * J / 2447);
+    U = Math.floor(V / 11);
 
-    return new Date(Y,M,D);
+    var piYear  = Math.floor( X + U + ( W - 49 ) * 100 );
+    var piMonth = Math.floor( V + 2 - ( U * 12 ) );
+    var piDay   = Math.floor( J - ( 2447 * V / 80 ) );
+//*/
+
+    return new Date(piYear,piMonth-1,piDay+1);
 }
 
 function GetDateTime(n,t) {
