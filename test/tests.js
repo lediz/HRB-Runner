@@ -1,5 +1,12 @@
+// 28/181 codes tested
 QUnit.test( "baseTypes", function( assert ) {
     var runner = new HRB();
+    // TESTING:
+    // HB_P_PUSHNIL, HB_P_RETVALUE, HB_P_ENDPROC
+    // HB_P_TRUE, HB_P_FALSE, HB_P_ZERO, HB_P_ONE
+    // HB_P_PUSHBYTE, HB_P_PUSHINT, HB_P_PUSHLONG
+    // HB_P_PUSHDOUBLE, HB_P_PUSHSTRSHORT, HB_P_ARRAYPOP,
+    // HB_P_ARRAYGEN,  HB_P_FRAME, HB_P_ARRAYDIM, HB_P_POPLOCALNEAR
     // func nilValue(); return nil
     assert.equal( runner.runCode({},(new Int8Array([100,110,7])).buffer,[]), undefined, "nilvalue");
     // func booleanTrue(); return .T.
@@ -43,6 +50,9 @@ QUnit.test( "dateTimeTypes", function( assert ) {
 
 QUnit.test( "comparissons", function( assert ) {
     var runner = new HRB();
+    // testing
+    // HB_P_EQUAL, HB_P_NOTEQUAL, HB_P_GREATER, HB_P_GREATEREQUAL
+    // HB_P_LESS, HB_P_LESSEQUAL,
     //func Equal(a,b); return a=b
     var Equal = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,5,110,7])).buffer,[a,b]);
     //func Different(a,b); return a==b
@@ -85,6 +95,9 @@ QUnit.test( "comparissons", function( assert ) {
 
 QUnit.test( "base math", function( assert ) {
     var runner = new HRB();
+    // TESTING
+    // HB_P_NEGATE, HB_P_PLUS, HB_P_MINUS, HB_P_MULT, HB_P_DIVIDE
+    // HB_P_DUPLICATE, HB_P_POP
     // function negate(a); return -a
     var neg = (a) => runner.runCode({},(new Int8Array([13,0,1,95,1,66,110,7])).buffer,[a]);
     //function add(a,b); return a+b
@@ -106,4 +119,16 @@ QUnit.test( "base math", function( assert ) {
     assert.equal( div(0.1,0.2), 0.5, "div 2 numbers float");
 
     assert.equal( add("1","2"), "12", "sum string");
+    // function logAnd(a,b); return a .and. b
+    var logAnd = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,21,28,5,73,95,2,110,7])).buffer,[a,b]);
+    // function logOr(a,b); return a .or. b
+    var logOr  = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,21,31,5,73,95,2,110,7])).buffer,[a,b]);
+    assert.equal( logAnd(false,false), false, "logical and 1");
+    assert.equal( logAnd(false, true), false, "logical and 2");
+    assert.equal( logAnd( true,false), false, "logical and 3");
+    assert.equal( logAnd( true, true),  true, "logical and 4");
+    assert.equal(  logOr(false,false), false, "logical or 1");
+    assert.equal(  logOr(false, true),  true, "logical or 2");
+    assert.equal(  logOr( true,false),  true, "logical or 3");
+    assert.equal(  logOr( true, true),  true, "logical or 4");
 });

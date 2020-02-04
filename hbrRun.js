@@ -148,7 +148,7 @@ function generateArray(dims) {
 
 VarReference.prototype.value = function() { return this.arr[this.idx]; }
 
-
+// 59/181 codes impleme1nted
 HRB.prototype.runCode = function(context,code,args) {
     var view = new DataView(code);
     var pCounter = 0;
@@ -235,6 +235,10 @@ HRB.prototype.runCode = function(context,code,args) {
                 stack.push(stack.popValue()/v);
                 pCounter+=1;
                 break; }
+            case  21 :             /* HB_P_DUPLICATE places a copy of the latest virtual machine stack value on to the stack */
+                stack.push(stack[stack.length-1]);
+                pCounter+=1;
+                break;
             case  22 :         /* HB_P_PUSHTIMESTAMP places a timestamp constant value on the virtual machine stack */
                 // from julian
                 stack.push( GetDateTime(view.getUint32(pCounter+1,true),view.getUint32(pCounter+5,true) ) );
@@ -313,6 +317,10 @@ HRB.prototype.runCode = function(context,code,args) {
                 stack.push(stack.popValue()+v);
                 pCounter+=1;
                 break; }
+            case  73 :                   /* HB_P_POP removes the latest value from the stack */
+                stack.popValue();
+                pCounter++;
+                break;
             case  80 : {         /* HB_P_POPLOCALNEAR pops the contents of the virtual machine stack onto a local variable */
                 let id = view.getUint8(pCounter+1);
                 if(id<=nArgs)

@@ -10,7 +10,6 @@ HRB.prototype.runCode = function(context,code,args) {
         case  10 :               /* HB_P_FORTEST For STEP. If step > 1 less. If step < 1 greater. */
         case  14 :               /* HB_P_FUNCPTR returns a function address pointer */
         case  17 :                   /* HB_P_DEC decrements the latest value on the virtual machine stack */
-        case  21 :             /* HB_P_DUPLICATE places a copy of the latest virtual machine stack value on to the stack */
         case  23 :                   /* HB_P_INC increments the latest value on the virtual machine stack */
         case  24 :              /* HB_P_INSTRING checks if the second latest value on the stack is a substring of the latest one */
         case  37 :             /* HB_P_LOCALNAME sets the name of local variable */
@@ -46,7 +45,6 @@ HRB.prototype.runCode = function(context,code,args) {
         case  68 :                   /* HB_P_NOT logically negates the latest value on the stack */
         case  70 :                    /* HB_P_OR performs the logical OR of two latest stack values, removes them and places result */
         case  72 :                  /* HB_P_PLUS adds the latest two values on the stack, removing them and leaving the result */
-        case  73 :                   /* HB_P_POP removes the latest value from the stack */
         case  74 :              /* HB_P_POPALIAS pops the item from the eval stack and selects the current workarea */
         case  75 :       /* HB_P_POPALIASEDFIELD pops aliased field */
         case  76 :   /* HB_P_POPALIASEDFIELDNEAR pops aliased field */

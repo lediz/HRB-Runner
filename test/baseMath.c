@@ -13,6 +13,8 @@ HB_FUNC( ADD );
 HB_FUNC( SUB );
 HB_FUNC( MUL );
 HB_FUNC( DIV );
+HB_FUNC( LOGAND );
+HB_FUNC( LOGOR );
 
 
 HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_BASEMATH )
@@ -20,7 +22,9 @@ HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_BASEMATH )
 { "ADD", {HB_FS_PUBLIC | HB_FS_LOCAL}, {HB_FUNCNAME( ADD )}, NULL },
 { "SUB", {HB_FS_PUBLIC | HB_FS_LOCAL}, {HB_FUNCNAME( SUB )}, NULL },
 { "MUL", {HB_FS_PUBLIC | HB_FS_LOCAL}, {HB_FUNCNAME( MUL )}, NULL },
-{ "DIV", {HB_FS_PUBLIC | HB_FS_LOCAL}, {HB_FUNCNAME( DIV )}, NULL }
+{ "DIV", {HB_FS_PUBLIC | HB_FS_LOCAL}, {HB_FUNCNAME( DIV )}, NULL },
+{ "LOGAND", {HB_FS_PUBLIC | HB_FS_LOCAL}, {HB_FUNCNAME( LOGAND )}, NULL },
+{ "LOGOR", {HB_FS_PUBLIC | HB_FS_LOCAL}, {HB_FUNCNAME( LOGOR )}, NULL }
 HB_INIT_SYMBOLS_EX_END( hb_vm_SymbolInit_BASEMATH, "baseMath.prg", 0x0, 0x0003 )
 
 #if defined( HB_PRAGMA_STARTUP )
@@ -75,6 +79,28 @@ HB_FUNC( DIV )
 	static const HB_BYTE pcode[] =
 	{
 		13,0,2,36,5,0,95,1,95,2,18,110,7
+	};
+
+	hb_vmExecute( pcode, symbols );
+}
+
+HB_FUNC( LOGAND )
+{
+	static const HB_BYTE pcode[] =
+	{
+		13,0,2,36,6,0,95,1,21,28,5,73,95,2,
+		110,7
+	};
+
+	hb_vmExecute( pcode, symbols );
+}
+
+HB_FUNC( LOGOR )
+{
+	static const HB_BYTE pcode[] =
+	{
+		13,0,2,36,7,0,95,1,21,31,5,73,95,2,
+		110,7
 	};
 
 	hb_vmExecute( pcode, symbols );
