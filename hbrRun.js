@@ -42,12 +42,9 @@ DataView.prototype.toStringANSI = function(from,len) {
 }
 
 /**
- *
  * @param {ArrayBuffer} binHRB
- * @param {function(Object)} onDone
- * @param {function(String)} onError
  */
-HRB.prototype.loadFromBuffer = function(binHRB, onDone, onError) {
+HRB.prototype.loadFromBuffer = function(binHRB) {
     return new Promise((resolve,reject) => {
         var view = new DataView(binHRB);
         // 0 4 @HRB header
@@ -84,24 +81,47 @@ HRB.prototype.loadFromBuffer = function(binHRB, onDone, onError) {
 
 function getSymbol(context, symb, mustOK) {
     if(symb.ptr) return symb.ptr;
-    if(symb.name in context) {
-        symb.ptr = context[symb.name];
-        if(isNative(symb.ptr)) console.warn(symb.name + " native");
-        return symb.ptr;
-    }
-    for (const key in context) {
-        if (context.hasOwnProperty(key)) {//  && typeof(context[key]) == "function" ) {
-            if(key.toUpperCase()==symb.name) {
-                symb.ptr = context[key];
-                if(isNative(symb.ptr)) console.warn(symb.name + " native");
-                return symb.ptr;
+    var name = symb.name;
+    if(name.startsWith("_")) name = name.substring(1);
+    var thisContext = context;
+    while(thisContext) {
+        if(name in thisContext) {
+            var retVal = context[name];
+            if(!symb.scope & 0x0020 ) //HB_FS_MESSAGE
+                symb.ptr = retVal
+            if(isNative(retVal)) console.warn(name + " native");
+            if(typeof(retVal) == "function" || typeof(retVal) == "object")
+                return retVal;
+            else
+                return name;
+        }
+        for (const key in thisContext) {
+            if (thisContext.hasOwnProperty(key)) {//  && typeof(context[key]) == "function" ) {
+                if(key.toUpperCase()==name) {
+                    var retVal = context[key];
+                    if(!symb.scope & 0x0020 ) //HB_FS_MESSAGE
+                        symb.ptr = retVal;
+                    if(isNative(retVal)) console.warn(name + " native");
+                    if(typeof(retVal) == "function" || typeof(retVal) == "object")
+                        return retVal;
+                    else
+                        return key;
+                }
             }
         }
+        if(symb.scope & 0x0020 ) {//HB_FS_MESSAGE
+            thisContext =  thisContext.__proto__
+        } else {
+            if(thisContext!=window) {
+                thisContext = window;
+                context = window;
+            } else
+                thisContext = null;
+        }
     }
-    if(context!=window) return getSymbol(window, symb, mustOK);
     if(mustOK)
-        throw "symbol not found:" + symb.name
-    console.error("symbol not found:" + symb.name);
+        throw "symbol not found:" + name
+    console.error("symbol not found:" + name);
     return undefined;
 }
 
@@ -214,7 +234,8 @@ HRB.prototype.runCode = function(context,code,args) {
             case  20 : {              /* HB_P_DOSHORT instructs the virtual machine to execute a function discarding its result */
                 let nParam = pCode&1? view.getUint16(pCounter+1,true) : view.getUint8(pCounter+1,true);
                 let params = stack.splice(stack.length-nParam);
-                let ret = stack.popValue().apply(undefined,params);
+                let pthis = stack.popValue();
+                let ret = stack.popValue().apply(pthis,params);
                 if(pCode<15)
                     stack.push(ret);
                 pCounter += pCode&1? 3 : 2;
@@ -292,6 +313,10 @@ HRB.prototype.runCode = function(context,code,args) {
                 currLine = view.getUint16(pCounter+1,true);
                 pCounter+=3;
                 break;
+            case  48 :               /* HB_P_MESSAGE sends a message to an object */
+                stack.push( this.symbols[view.getUint16(pCounter+1,true)]);
+                pCounter+=3;
+                break;
             case  49 :                 /* HB_P_MINUS subs the latest two values on the stack, removing them and leaving the result */
                 stack.push(-stack.popValue()+stack.popValue());
                 pCounter+=1;
@@ -351,7 +376,14 @@ HRB.prototype.runCode = function(context,code,args) {
                 stack.push( view.getInt32(pCounter+1,true));
                 pCounter+=5;
                 break;
-            case 100 :               /* HB_P_PUSHNIL places a nil on the virtual machine stack */
+            case  98 :            /* HB_P_PUSHMEMVAR pushes the contents of a memvar variable to the virtual machine stack */
+                stack.push(getSymbol(context, this.symbols[view.getUint16(pCounter+1,true)], true))
+                pCounter+=3;
+                break;
+//            case  99 :         /* HB_P_PUSHMEMVARREF pushes the a memvar variable by reference to the virtual machine stack */
+//                stack.push.
+//                break;
+//            case 100 :               /* HB_P_PUSHNIL places a nil on the virtual machine stack */
                 stack.push( undefined );
                 pCounter++;
                 break;
@@ -371,6 +403,22 @@ HRB.prototype.runCode = function(context,code,args) {
                 returnVal = stack.popValue();
                 pCounter+=1;
                 break;
+            case 111 :                  /* HB_P_SEND send operator */
+            case 112 : {            /* HB_P_SENDSHORT send operator */
+                    let nParam = pCode&1? view.getUint16(pCounter+1,true) : view.getUint8(pCounter+1,true);
+                    let params = stack.splice(stack.length-nParam);
+                    let pThis = stack.popValue();
+                    let fn = getSymbol(pThis, stack.pop(), true);
+                    let ret;
+                    if( typeof(fn) == "string")
+                        ret = pThis[fn] = params[0];
+                    else if( typeof(fn) == "function")
+                        ret = fn.apply(pThis,params);
+                    else
+                        ret = fn;
+                    stack.push(ret);
+                    pCounter += pCode&1? 3 : 2;
+                break; }
             case 120 :                  /* HB_P_TRUE pushes true on the virtual machine stack */
                 stack.push( true );
                 pCounter+=1;
@@ -465,7 +513,10 @@ HRB.prototype.apply = function(context) {
     }
     for(const i in this.symbols) {
         if (this.symbols.hasOwnProperty(i)) {
-            getSymbol(context, this.symbols[i], false);
+            if(this.symbols[i].scope & 1) //HB_FS_LOCAL
+                this.symbols[i].ptr = context[this.symbols[i].name]; // ajust added
+            else if(!this.symbols[i].scope & 0x0020 ) //HB_FS_MESSAGE
+                getSymbol(context, this.symbols[i], false);
         }
 
     }
@@ -480,3 +531,20 @@ HRB.prototype.replaceSymbol = function(symbName, fn) {
     }
     return false;
 }
+
+document.addEventListener("DOMContentLoaded", (e) => {
+    var hrb = new HRB();
+    var scripts = document.getElementsByTagName( 'script' );
+    var promises = [];
+    for (let i = 0; i < scripts.length; i++) {
+        const scr = scripts[i];
+        if(scr.getAttribute("type")=="harbour/hrb") {
+            promises.push(hrb.download(scr.getAttribute("src")));
+        }
+    }
+    if(promises.length>0)
+        Promise.all(promises).then(()=>{
+            hrb.apply();
+            hrb.symbols[0].ptr();
+        });
+})
