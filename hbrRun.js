@@ -1,3 +1,5 @@
+const isNative = require("./isNative.js").isNative
+
 function HRB() {
     this.functions=[];
     this.symbols=[];
@@ -548,3 +550,5 @@ document.addEventListener("DOMContentLoaded", (e) => {
             hrb.symbols[0].ptr();
         });
 })
+
+exports.HRB = HRB;

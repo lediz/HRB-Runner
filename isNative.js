@@ -1,5 +1,5 @@
 // https://davidwalsh.name/detect-native-function
-//;(function() {
+;(function() {
 
   // Used to resolve the internal `[[Class]]` of values
   var toString = Object.prototype.toString;
@@ -36,5 +36,5 @@
   }
 
   // export however you want
-  //module.exports = isNative;
-//}());
+  exports.isNative = isNative;
+}());

@@ -1,0 +1,29 @@
+{
+  "name": "hrb-runner",
+  "version": "0.0.3",
+  "description": "Harbour portable files javascript runner",
+  "main": "hbrRunner.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  },
+  "scripts": {
+    "test": "tests/index.html",
+    "prelanch": "webpack --mode development --watch",
+    "prerelease": "webpack --mode production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/APerricone/HRB-Runner.git"
+  },
+  "author": "Antonino Perricone",
+  "license": "GPL",
+  "bugs": {
+    "url": "https://github.com/APerricone/HRB-Runner/issues"
+  },
+  "homepage": "https://github.com/APerricone/HRB-Runner#readme"
+}
