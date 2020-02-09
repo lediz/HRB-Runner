@@ -9,40 +9,40 @@ QUnit.test( "baseTypes", function( assert ) {
     // HB_P_ARRAYGEN,  HB_P_FRAME, HB_P_ARRAYDIM, HB_P_POPLOCALNEAR
     // HB_P_PUSHDATE,HB_P_PUSHTIMESTAMP
     // func nilValue(); return nil
-    assert.equal( runner.runCode({},(new Int8Array([100,110,7])).buffer,[]), undefined, "nilvalue");
+    assert.equal( runner.runCode((new Int8Array([100,110,7])).buffer,[]), undefined, "nilvalue");
     // func booleanTrue(); return .T.
-    assert.equal( runner.runCode({},(new Int8Array([120,110,7])).buffer,[]), true, "Logical true");
+    assert.equal( runner.runCode((new Int8Array([120,110,7])).buffer,[]), true, "Logical true");
     // func booleanFalse(); return .T.
-    assert.equal( runner.runCode({},(new Int8Array([9,110,7])).buffer,[]), false, "Logical false");
+    assert.equal( runner.runCode((new Int8Array([9,110,7])).buffer,[]), false, "Logical false");
 
     // func ZeroValue(); return 0
-    assert.equal( runner.runCode({},(new Int8Array([121,110,7])).buffer,[]), 0, "numeric zero");
+    assert.equal( runner.runCode((new Int8Array([121,110,7])).buffer,[]), 0, "numeric zero");
     // func OneValue(); return 1
-    assert.equal( runner.runCode({},(new Int8Array([122,110,7])).buffer,[]), 1, "numeric one");
+    assert.equal( runner.runCode((new Int8Array([122,110,7])).buffer,[]), 1, "numeric one");
     // func UInt8Value(); return 10
-    assert.equal( runner.runCode({},(new Int8Array([92,10,110,7])).buffer,[]), 10, "numeric 10");
+    assert.equal( runner.runCode((new Int8Array([92,10,110,7])).buffer,[]), 10, "numeric 10");
     // func UInt16Value(); return 1000
-    assert.equal( runner.runCode({},(new Int8Array([93,232,3,110,7])).buffer,[]), 1000, "numeric 1000");
+    assert.equal( runner.runCode((new Int8Array([93,232,3,110,7])).buffer,[]), 1000, "numeric 1000");
     // func UInt32Value(); return 100000
-    assert.equal( runner.runCode({},(new Int8Array([97,160,134,1,0,110,7])).buffer,[]), 100000, "numeric 100000");
+    assert.equal( runner.runCode((new Int8Array([97,160,134,1,0,110,7])).buffer,[]), 100000, "numeric 100000");
     // func Int8Value(); return -10
-    assert.equal( runner.runCode({},(new Int8Array([92,246,110,7])).buffer,[]), -10, "numeric -10");
+    assert.equal( runner.runCode((new Int8Array([92,246,110,7])).buffer,[]), -10, "numeric -10");
     // func Int16Value(); return -1000
-    assert.equal( runner.runCode({},(new Int8Array([93,24,252,110,7])).buffer,[]), -1000, "numeric -1000");
+    assert.equal( runner.runCode((new Int8Array([93,24,252,110,7])).buffer,[]), -1000, "numeric -1000");
     // func Int32Value(); return -100000
-    assert.equal( runner.runCode({},(new Int8Array([97,96,121,254,255,110,7])).buffer,[]), -100000, "numeric -100000");
+    assert.equal( runner.runCode((new Int8Array([97,96,121,254,255,110,7])).buffer,[]), -100000, "numeric -100000");
     //func DoubleValue(); return 3.14159265359
-    assert.equal( runner.runCode({},(new Int8Array([101,234,46,68,84,251,33,9,64,10,11,110,7])).buffer,[]), 3.14159265359, "numeric pi");
+    assert.equal( runner.runCode((new Int8Array([101,234,46,68,84,251,33,9,64,10,11,110,7])).buffer,[]), 3.14159265359, "numeric pi");
     //func StringValue(); return "HelloWorld"
-    assert.equal( runner.runCode({},(new Int8Array([106,11,72,101,108,108,111,87,111,114,108,100,0,110,7])).buffer,[]), "HelloWorld", "character HelloWorld");
+    assert.equal( runner.runCode((new Int8Array([106,11,72,101,108,108,111,87,111,114,108,100,0,110,7])).buffer,[]), "HelloWorld", "character HelloWorld");
     //func ArrayValue(); return {1,2}
-    assert.deepEqual( runner.runCode({},(new Int8Array([122,92,2,4,2,0,110,7])).buffer,[]), [1,2], "array direct");
+    assert.deepEqual( runner.runCode((new Int8Array([122,92,2,4,2,0,110,7])).buffer,[]), [1,2], "array direct");
     //func ArrayValue2(); return Array(2)
-    assert.deepEqual( runner.runCode({},(new Int8Array([13,1,0,36,16,0,92,2,3,1,0,80,1,36,17,0,95,1,110,7])).buffer,[]), [undefined,undefined], "array empty");
+    assert.deepEqual( runner.runCode((new Int8Array([13,1,0,36,16,0,92,2,3,1,0,80,1,36,17,0,95,1,110,7])).buffer,[]), [undefined,undefined], "array empty");
     // func DateValue(); return {^ 2020-01-15 }
-    assert.deepEqual( runner.runCode({},(new Int8Array([134,240,132,37,0,110,7])).buffer,[]), new Date(2020,0,15), "simple date");
+    assert.deepEqual( runner.runCode((new Int8Array([134,240,132,37,0,110,7])).buffer,[]), new Date(2020,0,15), "simple date");
     // func DateValueTime(); return {^ 1987-12-01 12:34:56 }
-    assert.deepEqual( runner.runCode({},(new Int8Array([22,27,87,37,0,128,41,179,2,110,7])).buffer,[]), new Date(1987,11,1,12,34,56,100), "simple datetime ");
+    assert.deepEqual( runner.runCode((new Int8Array([22,27,87,37,0,128,41,179,2,110,7])).buffer,[]), new Date(1987,11,1,12,34,56,100), "simple datetime ");
 });
 
 QUnit.test( "comparissons", function( assert ) {
@@ -51,17 +51,17 @@ QUnit.test( "comparissons", function( assert ) {
     // HB_P_EQUAL, HB_P_NOTEQUAL, HB_P_GREATER, HB_P_GREATEREQUAL
     // HB_P_LESS, HB_P_LESSEQUAL,
     //func Equal(a,b); return a=b
-    var Equal = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,5,110,7])).buffer,[a,b]);
+    var Equal = (a,b) => runner.runCode((new Int8Array([13,0,2,95,1,95,2,5,110,7])).buffer,[a,b]);
     //func Different(a,b); return a==b
-    var Different = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,69,110,7])).buffer,[a,b]);
+    var Different = (a,b) => runner.runCode((new Int8Array([13,0,2,95,1,95,2,69,110,7])).buffer,[a,b]);
     //func GreaterFn(a,b); return a>b
-    var GreaterFn = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,15,110,7])).buffer,[a,b]);
+    var GreaterFn = (a,b) => runner.runCode((new Int8Array([13,0,2,95,1,95,2,15,110,7])).buffer,[a,b]);
     //func GreaterEqual(a,b); return a>=b
-    var GreaterEqual = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,16,110,7])).buffer,[a,b]);
+    var GreaterEqual = (a,b) => runner.runCode((new Int8Array([13,0,2,95,1,95,2,16,110,7])).buffer,[a,b]);
     //func LowerFn(a,b); return a<b
-    var LowerFn = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,35,110,7])).buffer,[a,b]);
+    var LowerFn = (a,b) => runner.runCode((new Int8Array([13,0,2,95,1,95,2,35,110,7])).buffer,[a,b]);
     //func LowerEqual(a,b); return a<=b
-    var LowerEqual = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,34,110,7])).buffer,[a,b]);
+    var LowerEqual = (a,b) => runner.runCode((new Int8Array([13,0,2,95,1,95,2,34,110,7])).buffer,[a,b]);
 
     assert.equal( Equal(1,1), true, "compare equal number true");
     assert.equal( Equal(1,2), false, "compare equal number false");
@@ -96,15 +96,15 @@ QUnit.test( "base math", function( assert ) {
     // HB_P_NEGATE, HB_P_PLUS, HB_P_MINUS, HB_P_MULT, HB_P_DIVIDE
     // HB_P_DUPLICATE, HB_P_POP
     // function negate(a); return -a
-    var neg = (a) => runner.runCode({},(new Int8Array([13,0,1,95,1,66,110,7])).buffer,[a]);
+    var neg = (a) => runner.runCode((new Int8Array([13,0,1,95,1,66,110,7])).buffer,[a]);
     //function add(a,b); return a+b
-    var add = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,72,110,7])).buffer,[a,b]);
+    var add = (a,b) => runner.runCode((new Int8Array([13,0,2,95,1,95,2,72,110,7])).buffer,[a,b]);
     //function sub(a,b); return a-b
-    var sub = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,49,110,7])).buffer,[a,b]);
+    var sub = (a,b) => runner.runCode((new Int8Array([13,0,2,95,1,95,2,49,110,7])).buffer,[a,b]);
     //function mul(a,b); return a*b
-    var mul = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,65,110,7])).buffer,[a,b]);
+    var mul = (a,b) => runner.runCode((new Int8Array([13,0,2,95,1,95,2,65,110,7])).buffer,[a,b]);
     //function div(a,b); return a/b
-    var div = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,95,2,18,110,7])).buffer,[a,b]);
+    var div = (a,b) => runner.runCode((new Int8Array([13,0,2,95,1,95,2,18,110,7])).buffer,[a,b]);
     assert.equal( neg(0.1), -0.1, "negate number");
     assert.equal( add(1,2), 3, "sum 2 numbers int");
     assert.equal( add(0.1,0.2), 0.1+0.2, "sum 2 numbers float");
@@ -117,9 +117,9 @@ QUnit.test( "base math", function( assert ) {
 
     assert.equal( add("1","2"), "12", "sum string");
     // function logAnd(a,b); return a .and. b
-    var logAnd = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,21,28,5,73,95,2,110,7])).buffer,[a,b]);
+    var logAnd = (a,b) => runner.runCode((new Int8Array([13,0,2,95,1,21,28,5,73,95,2,110,7])).buffer,[a,b]);
     // function logOr(a,b); return a .or. b
-    var logOr  = (a,b) => runner.runCode({},(new Int8Array([13,0,2,95,1,21,31,5,73,95,2,110,7])).buffer,[a,b]);
+    var logOr  = (a,b) => runner.runCode((new Int8Array([13,0,2,95,1,21,31,5,73,95,2,110,7])).buffer,[a,b]);
     assert.equal( logAnd(false,false), false, "logical and 1");
     assert.equal( logAnd(false, true), false, "logical and 2");
     assert.equal( logAnd( true,false), false, "logical and 3");

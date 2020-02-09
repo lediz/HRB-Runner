@@ -14,18 +14,41 @@
         {
             "label": "generate HRB",
             "type": "shell",
-            "args": ["${fileBasename}","-gh", "-n0", "-Ic:\\harbour\\include"],
+            "args": [
+                "${fileBasename}",
+                "-gh",
+                "-n0",
+                "-Ic:\\harbour\\include"
+            ],
             "group": "build"
-        },{
+        },
+        {
             "label": "generate Code",
             "type": "shell",
-            "args": ["${fileBasename}","-gc2", "-n0", "-Ic:\\harbour\\include"],
+            "args": [
+                "${fileBasename}",
+                "-gc2",
+                "-n0",
+                "-Ic:\\harbour\\include"
+            ],
             "group": "build"
-        },{
+        },
+        {
             "label": "generate byte code",
             "type": "shell",
-            "args": ["${fileBasename}","-gc0", "-n0", "-Ic:\\harbour\\include"],
+            "args": [
+                "${fileBasename}",
+                "-gc0",
+                "-n0",
+                "-Ic:\\harbour\\include"
+            ],
             "group": "build"
+        },
+        {
+            "type": "npm",
+            "script": "prelanch",
+            "group": {"isDefault": true, "kind": "build"},
+            "problemMatcher": []
         }
     ]
 }

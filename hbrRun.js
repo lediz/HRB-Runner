@@ -1,6 +1,9 @@
 const isNative = require("./isNative.js").isNative
+const VarReference = require("./VarReference.js").VarReference
+const HBDateTime = require("./HBDateTime.js").HBDateTime
 
-function HRB() {
+function HRB(context) {
+    this.context = context || window;
     this.functions=[];
     this.symbols=[];
 }
@@ -114,9 +117,9 @@ function getSymbol(context, symb, mustOK) {
         if(symb.scope & 0x0020 ) {//HB_FS_MESSAGE
             thisContext =  thisContext.__proto__
         } else {
-            if(thisContext!=window) {
-                thisContext = window;
-                context = window;
+            if(thisContext!=this.context) {
+                thisContext = this.context;
+                context = this.context;
             } else
                 thisContext = null;
         }
@@ -154,11 +157,6 @@ function GetDateTime(n,t) {
     return r;
 }
 
-function VarReference(arr,idx) {
-    this.arr = arr;
-    this.idx = idx;
-}
-
 function generateArray(dims) {
     var ret = Array(dims[0]);
     if(dims.length>1) {
@@ -170,10 +168,8 @@ function generateArray(dims) {
     return ret;
 }
 
-VarReference.prototype.value = function() { return this.arr[this.idx]; }
-
 // 59/181 codes impleme1nted
-HRB.prototype.runCode = function(context,code,args) {
+HRB.prototype.runCode = function(code,args) {
     var view = new DataView(code);
     var pCounter = 0;
     var stack = [];
@@ -264,11 +260,12 @@ HRB.prototype.runCode = function(context,code,args) {
                 stack.push(stack[stack.length-1]);
                 pCounter+=1;
                 break;
-            case  22 :         /* HB_P_PUSHTIMESTAMP places a timestamp constant value on the virtual machine stack */
-                // from julian
-                stack.push( GetDateTime(view.getUint32(pCounter+1,true),view.getUint32(pCounter+5,true) ) );
+            case  22 : {        /* HB_P_PUSHTIMESTAMP places a timestamp constant value on the virtual machine stack */
+                var v = new HBDateTime();
+                v.setFromJulianAndTime(view.getUint32(pCounter+1,true),view.getUint32(pCounter+5,true));
+                stack.push( v );
                 pCounter+=9;
-                break;
+                break; }
             case  24 :              /* HB_P_INSTRING checks if the second latest value on the stack is a substring of the latest one */
                 stack.push(stack.popValue().indexOf(stack.popValue())>=0);
                 pCounter+=1;
@@ -379,13 +376,13 @@ HRB.prototype.runCode = function(context,code,args) {
                 pCounter+=5;
                 break;
             case  98 :            /* HB_P_PUSHMEMVAR pushes the contents of a memvar variable to the virtual machine stack */
-                stack.push(getSymbol(context, this.symbols[view.getUint16(pCounter+1,true)], true))
+                stack.push(getSymbol(this.context, this.symbols[view.getUint16(pCounter+1,true)], true))
                 pCounter+=3;
                 break;
 //            case  99 :         /* HB_P_PUSHMEMVARREF pushes the a memvar variable by reference to the virtual machine stack */
 //                stack.push.
 //                break;
-//            case 100 :               /* HB_P_PUSHNIL places a nil on the virtual machine stack */
+            case 100 :               /* HB_P_PUSHNIL places a nil on the virtual machine stack */
                 stack.push( undefined );
                 pCounter++;
                 break;
@@ -433,11 +430,12 @@ HRB.prototype.runCode = function(context,code,args) {
                 stack.push( 1 );
                 pCounter+=1;
                 break;
-            case 134 :           /* HB_P_PUSHDATE places a data constant value on the virtual machine stack */
-                // from julian
-                stack.push( julianIntToDate(view.getUint32(pCounter+1,true)) );
+            case 134 : {          /* HB_P_PUSHDATE places a data constant value on the virtual machine stack */
+                var v = new HBDateTime();
+                v.setFromJulian(view.getUint32(pCounter+1,true));
+                stack.push(v);
                 pCounter+=5;
-                break;
+                break; }
             case 135 : {            /* HB_P_PLUSEQPOP adds a value to the variable reference */
                 let d = stack.popValue();
                 let v = stack.pop();
@@ -491,7 +489,7 @@ HRB.prototype.runCode = function(context,code,args) {
                 pCounter += 3;
                 break; }
             case 176 :           /* HB_P_PUSHFUNCSYM places a symbol on the virtual machine stack */
-                stack.push( getSymbol(context, this.symbols[view.getUint16(pCounter+1,true)], true) );
+                stack.push( getSymbol(this.context, this.symbols[view.getUint16(pCounter+1,true)], true) );
                 pCounter+=3;
                 break;
             default:
@@ -500,25 +498,24 @@ HRB.prototype.runCode = function(context,code,args) {
     }
 }
 
-HRB.prototype.getFn = function(context,code) {
+HRB.prototype.getFn = function(code) {
     var tc = this;
-    return function() { return tc.runCode(context,code,arguments); }
+    return function() { return tc.runCode(code,arguments); }
 }
 
-HRB.prototype.apply = function(context) {
-    if(!context) context=window;
+HRB.prototype.apply = function() {
     for(const i in this.functions) {
         if (this.functions.hasOwnProperty(i)) {
             const thisFn = this.functions[i];
-            context[thisFn.name] = this.getFn(context,thisFn.code);
+            this.context[thisFn.name] = this.getFn(thisFn.code);
         }
     }
     for(const i in this.symbols) {
         if (this.symbols.hasOwnProperty(i)) {
             if(this.symbols[i].scope & 1) //HB_FS_LOCAL
-                this.symbols[i].ptr = context[this.symbols[i].name]; // ajust added
+                this.symbols[i].ptr = this.context[this.symbols[i].name]; // ajust added
             else if(!this.symbols[i].scope & 0x0020 ) //HB_FS_MESSAGE
-                getSymbol(context, this.symbols[i], false);
+                getSymbol(this.context, this.symbols[i], false);
         }
 
     }
@@ -551,4 +548,4 @@ document.addEventListener("DOMContentLoaded", (e) => {
         });
 })
 
-exports.HRB = HRB;
+window.HRB = HRB;

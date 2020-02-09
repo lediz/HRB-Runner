@@ -1,6 +1,6 @@
 {
   "name": "hrb-runner",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Harbour portable files javascript runner",
   "main": "hbrRunner.js",
   "directories": {

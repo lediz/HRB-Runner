@@ -18,6 +18,9 @@ It is possible automatically download the hrb files including it on header in th
 <script src="directHB.hrb" type="harbour/hrb"></script>
 ```
 When the DOM is loaded all script of type *harbour/hrb* will be loaded by the hrbRunner and the first function is executed.
+
+**It is necessary a file server to run a hrb file.**
+
 ## How to create hrb files
 To create an hrb files it is sufficient run harbour
 ```shell
