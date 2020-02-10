@@ -1,6 +1,6 @@
-const isNative = require("./isNative.js").isNative
-const VarReference = require("./VarReference.js").VarReference
-const HBDateTime = require("./HBDateTime.js").HBDateTime
+const isNative = require("./isNative.js");
+const VarReference = require("./VarReference.js");
+const HBDateTime = require("./HBDateTime.js");
 
 function HRB(context) {
     this.context = context || window;
@@ -232,8 +232,7 @@ HRB.prototype.runCode = function(code,args) {
             case  20 : {              /* HB_P_DOSHORT instructs the virtual machine to execute a function discarding its result */
                 let nParam = pCode&1? view.getUint16(pCounter+1,true) : view.getUint8(pCounter+1,true);
                 let params = stack.splice(stack.length-nParam);
-                let pthis = stack.popValue();
-                let ret = stack.popValue().apply(pthis,params);
+                let ret = stack.popValue().apply(undefined,params);
                 if(pCode<15)
                     stack.push(ret);
                 pCounter += pCode&1? 3 : 2;
@@ -261,8 +260,7 @@ HRB.prototype.runCode = function(code,args) {
                 pCounter+=1;
                 break;
             case  22 : {        /* HB_P_PUSHTIMESTAMP places a timestamp constant value on the virtual machine stack */
-                var v = new HBDateTime();
-                v.setFromJulianAndTime(view.getUint32(pCounter+1,true),view.getUint32(pCounter+5,true));
+                var v = new HBDateTime(view.getUint32(pCounter+1,true),view.getUint32(pCounter+5,true));
                 stack.push( v );
                 pCounter+=9;
                 break; }
@@ -339,8 +337,14 @@ HRB.prototype.runCode = function(code,args) {
                 pCounter+=1;
                 break;
             case  72 : {                 /* HB_P_PLUS adds the latest two values on the stack, removing them and leaving the result */
-                var v=stack.popValue();
-                stack.push(stack.popValue()+v);
+                var v1=stack.popValue();
+                var v2=stack.popValue();
+                if(typeof(v1)=="object" && v1.constructor==HBDateTime)
+                    stack.push(v1.add(v2));
+                else if(typeof(v2)=="object" && v2.constructor==HBDateTime)
+                    stack.push(v2.add(v1));
+                else
+                    stack.push(v1+v2);
                 pCounter+=1;
                 break; }
             case  73 :                   /* HB_P_POP removes the latest value from the stack */
@@ -431,16 +435,18 @@ HRB.prototype.runCode = function(code,args) {
                 pCounter+=1;
                 break;
             case 134 : {          /* HB_P_PUSHDATE places a data constant value on the virtual machine stack */
-                var v = new HBDateTime();
-                v.setFromJulian(view.getUint32(pCounter+1,true));
+                var v = new HBDateTime(view.getUint32(pCounter+1,true));
                 stack.push(v);
                 pCounter+=5;
                 break; }
             case 135 : {            /* HB_P_PLUSEQPOP adds a value to the variable reference */
                 let d = stack.popValue();
                 let v = stack.pop();
-                if(typeof(v)!="object" || v.constructor!=VarReference) throw "VM error";
-                v.arr[v.idx]+=d;
+                var dest =v.value();
+                if(typeof(dest)=="object" && dest.constructor==HBDateTime) {
+                    dest.add(d);
+                } else
+                    v.arr[v.idx]+=d;
                 pCounter++;
                 break;  }
             case 136 : {           /* HB_P_MINUSEQPOP subs a value from the variable reference */

@@ -5,4 +5,4 @@ function VarReference(arr,idx) {
 
 VarReference.prototype.value = function() { return this.arr[this.idx]; }
 
-exports.VarReference = VarReference;
+module.exports = VarReference;

@@ -1,13 +1,14 @@
 class HBDateTime extends Date {
     constructor(lJulian, lMilliseconds) {
         super();
-        //this = new Date();
-        if (lMilliseconds)
-            this.setFromJulianAndTime(lJulian, lMilliseconds);
-        else
-            this.setFromJulian(lJulian);
+        this.lJulian = lJulian;
+        this.isDateTime = typeof(lMilliseconds) == "number";
+        this.lMilliseconds = this.isDateTime? lMilliseconds : 0;
+
+        this.update()
     }
-    setFromJulian(lJulian) {
+    update() {
+        var lJulian = this.lJulian;
         // void hb_dateDecode( long lJulian, int * piYear, int * piMonth, int * piDay )
         var U, V, W, X, J;
         J = lJulian + 68569;
@@ -22,13 +23,17 @@ class HBDateTime extends Date {
         var piDay = Math.floor(J - (2447 * V / 80));
         //*/
         this.setFullYear(piYear, piMonth - 1, piDay + 1);
-        this.isDate = true;
+        if(this.isDateTime) {
+            this.setHours(0,0,0,0);
+            this.setMilliseconds(this.lMilliseconds);
+        }
     }
-    setFromJulianAndTime(lJulian, lMilliseconds) {
-        this.setFromJulian(lJulian);
-        this.isDate = false;
-        this.setMilliseconds(lMilliseconds);
+    add(v) {
+        if(typeof(v)=="number") {
+            this.lJulian+=v;
+            this.update();
+        }
     }
 }
 
-exports.HBDateTime = HBDateTime;
+module.exports = HBDateTime;

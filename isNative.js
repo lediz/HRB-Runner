@@ -36,5 +36,5 @@
   }
 
   // export however you want
-  exports.isNative = isNative;
+  module.exports = isNative;
 }());
