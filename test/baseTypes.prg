@@ -19,4 +19,4 @@ func ArrayValue3()
     LOCAL a[2,3]
 return a
 func DateValue(); return {^ 2020-01-15 }
-func DateValueTime(); return {^ 1987-12-01 12:34:56 }
+func DateValueTime(); return {^ 1987-12-01 12:34:56.1 }

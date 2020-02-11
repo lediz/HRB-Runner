@@ -44,7 +44,7 @@ QUnit.test( "baseTypes", function( assert ) {
     // func DateValue(); return {^ 2020-01-15 }
     assert.deepEqual( runner.runCode((new Int8Array([134,240,132,37,0,110,7])).buffer,[]), new Date(2020,0,15), "simple date");
     // func DateValueTime(); return {^ 1987-12-01 12:34:56 }
-    assert.deepEqual( runner.runCode((new Int8Array([22,27,87,37,0,128,41,179,2,110,7])).buffer,[]), new Date(1987,11,1,12,34,56,100), "simple datetime ");
+    assert.deepEqual( runner.runCode((new Int8Array([22,27,87,37,0,228,41,179,2,110,7])).buffer,[]), new Date(1987,11,1,12,34,56,100), "simple datetime ");
 });
 
 QUnit.test( "comparissons", function( assert ) {

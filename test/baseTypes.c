@@ -234,7 +234,7 @@ HB_FUNC( DATEVALUETIME )
 {
 	static const HB_BYTE pcode[] =
 	{
-		36,22,0,22,27,87,37,0,128,41,179,2,110,7
+		36,22,0,22,27,87,37,0,228,41,179,2,110,7
 	};
 
 	hb_vmExecute( pcode, symbols );
