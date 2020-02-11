@@ -1,17 +1,29 @@
 class HBDateTime extends Date {
     constructor(lJulian, lMilliseconds) {
-        super();
-        this.lJulian = lJulian;
-        this.isDateTime = typeof(lMilliseconds) == "number";
-        this.lMilliseconds = this.isDateTime? lMilliseconds : 0;
-
-        this.update()
+        if(typeof(lJulian)=="number" && arguments.length<=2) {
+            super(0);
+            this.dateDecode(lJulian, lMilliseconds);
+        } else {
+            // can't I use call?
+            switch(arguments.length) {
+                case 0: super(); break;
+                case 1: super(arguments[0]); break;
+                case 2: super(arguments[0],arguments[1]); break;
+                default:
+                    throw "unimplemented";
+            }
+        }
     }
-    update() {
-        var lJulian = this.lJulian;
+    dateDecode(lJulian, lMilliseconds) {
         // void hb_dateDecode( long lJulian, int * piYear, int * piMonth, int * piDay )
         var U, V, W, X, J;
-        J = lJulian + 68569;
+        J = Math.floor(lJulian);
+        if(lJulian!=J) {
+            if(typeof(lMilliseconds)!="number")
+                lMilliseconds=0;
+            lMilliseconds+=(lJulian-J)*24*60*60*1000;
+        }
+        J += 68569;
         W = Math.floor((J * 4) / 146097);
         J -= Math.floor(((146097 * W) + 3) / 4);
         X = Math.floor(4000 * (J + 1) / 1461001);
@@ -23,16 +35,26 @@ class HBDateTime extends Date {
         var piDay = Math.floor(J - (2447 * V / 80));
         //*/
         this.setFullYear(piYear, piMonth - 1, piDay + 1);
+        this.isDateTime = typeof(lMilliseconds) == "number";
+        this.setHours(0,0,0,0);
         if(this.isDateTime) {
-            this.setHours(0,0,0,0);
-            this.setMilliseconds(this.lMilliseconds);
+            this.setMilliseconds(lMilliseconds);
         }
     }
     add(v) {
         if(typeof(v)=="number") {
-            this.lJulian+=v;
-            this.update();
+            var J = Math.floor(v);
+            this.setDate(this.getDate()+J);
+            if(J!=v) {
+                var M=(v-J)*24*60*60*1000;
+                this.setMilliseconds(this.getMilliseconds()+M);
+            }
+        } else {
+            //var d=this;
+            //d+=v;
+            //this=d;
         }
+        return this;
     }
 }
 

@@ -38,7 +38,9 @@ QUnit.test( "baseTypes", function( assert ) {
     //func ArrayValue(); return {1,2}
     assert.deepEqual( runner.runCode((new Int8Array([122,92,2,4,2,0,110,7])).buffer,[]), [1,2], "array direct");
     //func ArrayValue2(); return Array(2)
-    assert.deepEqual( runner.runCode((new Int8Array([13,1,0,36,16,0,92,2,3,1,0,80,1,36,17,0,95,1,110,7])).buffer,[]), [undefined,undefined], "array empty");
+    assert.deepEqual( runner.runCode((new Int8Array([13,1,0,92,2,3,1,0,80,1,95,1,110,7])).buffer,[]), [undefined,undefined], "array empty");
+    //func ArrayValue3(); return Array(2,3)
+    assert.deepEqual( runner.runCode((new Int8Array([13,1,0,92,2,92,3,3,2,0,80,1,95,1,110,7])).buffer,[]), [[undefined,undefined,undefined],[undefined,undefined,undefined]], "multi array empty");
     // func DateValue(); return {^ 2020-01-15 }
     assert.deepEqual( runner.runCode((new Int8Array([134,240,132,37,0,110,7])).buffer,[]), new Date(2020,0,15), "simple date");
     // func DateValueTime(); return {^ 1987-12-01 12:34:56 }
@@ -116,6 +118,8 @@ QUnit.test( "base math", function( assert ) {
     assert.equal( div(0.1,0.2), 0.5, "div 2 numbers float");
 
     assert.equal( add("1","2"), "12", "sum string");
+    assert.deepEqual( add(new Date(2020,1,1),2), new Date(2020,1,3), "sum date");
+    assert.deepEqual( add(0.5,new Date(2020,1,1)), new Date(2020,1,1,12), "sum dateTime");
     // function logAnd(a,b); return a .and. b
     var logAnd = (a,b) => runner.runCode((new Int8Array([13,0,2,95,1,21,28,5,73,95,2,110,7])).buffer,[a,b]);
     // function logOr(a,b); return a .or. b

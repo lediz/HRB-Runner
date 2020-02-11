@@ -337,14 +337,19 @@ HRB.prototype.runCode = function(code,args) {
                 pCounter+=1;
                 break;
             case  72 : {                 /* HB_P_PLUS adds the latest two values on the stack, removing them and leaving the result */
-                var v1=stack.popValue();
-                var v2=stack.popValue();
-                if(typeof(v1)=="object" && v1.constructor==HBDateTime)
-                    stack.push(v1.add(v2));
-                else if(typeof(v2)=="object" && v2.constructor==HBDateTime)
-                    stack.push(v2.add(v1));
-                else
-                    stack.push(v1+v2);
+                let v1=stack.popValue();
+                let v2=stack.popValue();
+                if(typeof(v1)=="object" && v1.constructor==HBDateTime || v1.constructor==Date)  {
+                    v1=v1.constructor==Date? new HBDateTime(v1) : v1;
+                    if(typeof(v2)=="object" && v2.constructor==Date)
+                        v2=new HBDateTime(v2);
+                    stack.push(new Date(v1.add(v2)));
+                }
+                else if(typeof(v2)=="object" && v2.constructor==HBDateTime || v2.constructor==Date) {
+                    v2=v2.constructor==Date? new HBDateTime(v2) : v2;
+                    stack.push(new Date(v2.add(v1)));
+                } else
+                    stack.push(v2+v1);
                 pCounter+=1;
                 break; }
             case  73 :                   /* HB_P_POP removes the latest value from the stack */
