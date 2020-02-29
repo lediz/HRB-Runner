@@ -37,13 +37,13 @@ QUnit.test( "baseTypes", function( assert ) {
     assert.equal( runner.runCode((new Int8Array([106,11,72,101,108,108,111,87,111,114,108,100,0,110,7])).buffer,[]), "HelloWorld", "character HelloWorld");
     //func ArrayValue(); return {1,2}
     assert.deepEqual( runner.runCode((new Int8Array([122,92,2,4,2,0,110,7])).buffer,[]), [1,2], "array direct");
-    //func ArrayValue2(); return Array(2)
+    //func ArrayValue2(); local a(2); return a
     assert.deepEqual( runner.runCode((new Int8Array([13,1,0,92,2,3,1,0,80,1,95,1,110,7])).buffer,[]), [undefined,undefined], "array empty");
-    //func ArrayValue3(); return Array(2,3)
+    //func ArrayValue3(); local a(2,3); return a
     assert.deepEqual( runner.runCode((new Int8Array([13,1,0,92,2,92,3,3,2,0,80,1,95,1,110,7])).buffer,[]), [[undefined,undefined,undefined],[undefined,undefined,undefined]], "multi array empty");
     // func DateValue(); return {^ 2020-01-15 }
     assert.deepEqual( runner.runCode((new Int8Array([134,240,132,37,0,110,7])).buffer,[]), new Date(2020,0,15), "simple date");
-    // func DateValueTime(); return {^ 1987-12-01 12:34:56 }
+    // func DateValueTime(); return {^ 1987-12-01 12:34:56.1 }
     assert.deepEqual( runner.runCode((new Int8Array([22,27,87,37,0,228,41,179,2,110,7])).buffer,[]), new Date(1987,11,1,12,34,56,100), "simple datetime ");
 });
 

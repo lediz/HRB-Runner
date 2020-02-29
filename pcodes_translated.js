@@ -6,7 +6,6 @@ HRB.prototype.runCode = function(context,code,args) {
     while(true) {
         var pCode = view.getUint8(pCounter);
         switch(pCode) {
-        case   6 :              /* HB_P_ENDBLOCK end of a codeblock definition */
         case  10 :               /* HB_P_FORTEST For STEP. If step > 1 less. If step < 1 greater. */
         case  14 :               /* HB_P_FUNCPTR returns a function address pointer */
         case  17 :                   /* HB_P_DEC decrements the latest value on the virtual machine stack */
@@ -51,21 +50,17 @@ HRB.prototype.runCode = function(context,code,args) {
         case  78 :              /* HB_P_POPFIELD pops unaliased field */
         case  79 :              /* HB_P_POPLOCAL pops the contents of the virtual machine stack onto a local variable */
         case  81 :             /* HB_P_POPMEMVAR pops the contents of a memvar variable to the virtual machine stack */
-        case  82 :             /* HB_P_POPSTATIC pops the contents of the virtual machine stack onto a static variable */
         case  83 :           /* HB_P_POPVARIABLE pops the contents of an undeclared variable from the virtual machine stack */
         case  84 :                 /* HB_P_POWER calculates the power of the two values on the stack, removing them and leaving the result */
         case  85 :             /* HB_P_PUSHALIAS saves the current workarea number on the eval stack */
         case  86 :      /* HB_P_PUSHALIASEDFIELD pushes aliased field */
         case  87 :  /* HB_P_PUSHALIASEDFIELDNEAR pushes aliased field */
         case  88 :        /* HB_P_PUSHALIASEDVAR pushes aliased variable (either a field or a memvar) */
-        case  89 :             /* HB_P_PUSHBLOCK start of a codeblock definition */
         case  90 :        /* HB_P_PUSHBLOCKSHORT start of a codeblock definition */
         case  91 :             /* HB_P_PUSHFIELD pushes an unaliased field */
         case  94 :             /* HB_P_PUSHLOCAL pushes the contents of a local variable to the virtual machine stack */
         case  96 :          /* HB_P_PUSHLOCALREF pushes a local variable by reference to the virtual machine stack */
         case 102 :              /* HB_P_PUSHSELF pushes Self for the current processed method */
-        case 103 :            /* HB_P_PUSHSTATIC pushes the contents of a static variable to the virtual machine stack */
-        case 104 :         /* HB_P_PUSHSTATICREF pushes the a static variable by reference to the virtual machine stack */
         case 105 :               /* HB_P_PUSHSTR places a string on the virtual machine stack */
         case 107 :               /* HB_P_PUSHSYM places a symbol on the virtual machine stack */
         case 108 :           /* HB_P_PUSHSYMNEAR places a symbol on the virtual machine stack */
@@ -73,8 +68,6 @@ HRB.prototype.runCode = function(context,code,args) {
         case 113 :              /* HB_P_SEQBEGIN BEGIN SEQUENCE */
         case 114 :                /* HB_P_SEQEND END SEQUENCE */
         case 115 :            /* HB_P_SEQRECOVER RECOVER statement */
-        case 116 :                /* HB_P_SFRAME sets the statics frame for a function */
-        case 117 :               /* HB_P_STATICS defines the number of statics variables for a PRG */
         case 118 :            /* HB_P_STATICNAME sets the name of static variable */
         case 119 :             /* HB_P_SWAPALIAS restores the current workarea number from the eval stack */
         case 123 :             /* HB_P_MACROFUNC execute a function saving its result */
